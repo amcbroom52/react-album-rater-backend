@@ -4,9 +4,16 @@
 
 {% block content %}
 
-<form id="search-form">
-  <input type="text" placeholder="Search..." class="form-control bg-dark text-light" required>
-  <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+<form id="search-form" class="col-9 mt-5" style="margin: auto;">
+  <div style="position: relative;" class="mb-3">
+    <input type="text" placeholder="Search..." class="form-control bg-dark text-light" style="display: inline-block; border-radius: 40px;" required>
+    <button type="submit"
+      class="bg-dark h-75"
+      style="position: absolute; top: 13%; right: 10px; border: none;">
+      <i class="bi bi-search text-light"></i>
+    </button>
+  </div>
+  <div class="btn-group col-5" role="group" aria-label="Basic radio toggle button group" style="margin: auto;">
     <input type="radio" class="btn-check" name="search-type" id="btnradio1" checked="" required value="album">
     <label class="btn btn-outline-primary" for="btnradio1">Albums</label>
     <input type="radio" class="btn-check" name="search-type" id="btnradio2" value="artist">
@@ -14,10 +21,9 @@
     <input type="radio" class="btn-check" name="search-type" id="btnradio3" value="user">
     <label class="btn btn-outline-primary" for="btnradio3">Users</label>
   </div>
-  <button type="submit" class="bg-dark"><i class="bi bi-search text-light"></i></button>
 </form>
 
-<div id="search-results">
+<div id="search-results" class="col-9 mt-5" style="margin: auto;">
 
 </div>
 

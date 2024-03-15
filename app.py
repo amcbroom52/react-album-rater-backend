@@ -150,8 +150,6 @@ def handle_signup_form():
                 username=form.username.data,
                 first_name=form.first_name.data,
                 last_name=form.last_name.data or None,
-                bio=form.bio.data or None,
-                image_url=form.image_url.data or None,
                 password=form.password.data
             )
 
@@ -341,7 +339,7 @@ def handle_rating_form(album_id):
     form.favorite_song.choices = song_choices
 
     if rating:
-        flash("Redirected to edit previous rating", "alert-warning")
+        flash("Redirected to edit previous rating", "warning")
         return redirect(url_for('edit_rating', album_id=album_id))
 
     if form.validate_on_submit():

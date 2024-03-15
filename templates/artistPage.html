@@ -6,14 +6,18 @@
 
 <div class="col-10 mt-3" style="margin: auto;">
 
-  <img src="{{artist.image_url}}" alt="{{artist.name}} Image" class="w-25 h-25" style="border-radius: 50%; display: inline-block;">
+  <img src="{{artist.image_url}}" alt="{{artist.name}} Image" class="w-25 h-25" style="border-radius: 1500px; display: inline-block;">
 
   <div style="display: inline-block;" class="ms-3">
     <h1>{{artist.name}}</h1>
+    {% for genre in artist.genres %}
+    <span class="badge rounded-pill bg-primary">{{genre}}</span>
+    {% endfor %}
 
   </div>
 
 </div>
+
 
 <div class="mt-5">
 

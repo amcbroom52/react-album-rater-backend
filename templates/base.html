@@ -15,10 +15,10 @@
 </head>
 
 {% for category, message in get_flashed_messages(with_categories=True) %}
-<div class="alert alert-{{ category }}">{{ message }}</div>
+<div class="alert alert-{{ category }} mb-0">{{ message }}</div>
 {% endfor %}
 
-<nav class="navbar navbar-expand bg-primary mb-5" data-bs-theme="dark">
+<nav class="navbar navbar-expand bg-primary" data-bs-theme="dark" style="height: 50px;">
   <div class="container-fluid">
     <ul class="navbar-nav me-auto">
       <li class="nav-item">

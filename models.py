@@ -121,7 +121,7 @@ class User(db.Model):
         return f"<User {self.username}: {self.first_name} {self.last_name}>"
 
     @classmethod
-    def signup(cls, username, first_name, last_name, bio, password, image_url):
+    def signup(cls, username, first_name, last_name, password):
         """Sign up user.
 
         Hashes password and adds user to session.
@@ -134,8 +134,6 @@ class User(db.Model):
             first_name=first_name,
             last_name=last_name,
             password=hashed_pwd,
-            bio=bio,
-            image_url=image_url,
         )
 
         db.session.add(user)

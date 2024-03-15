@@ -3,29 +3,35 @@
 {% block title %} Login {% endblock %}
 
 {% block content %}
-<form method="POST">
-  {{ form.hidden_tag() }}
+<h1 style="text-align: center;" class="text-primary mt-5">Login</h1>
 
-  {% for field in form
-         if field.widget.input_type != 'hidden' %}
+<div class="card border-primary mb-3 mt-5 text-light col-8 col-sm-3" style="background-color: rgba(38, 39, 48, 0.141); margin: auto;">
+  <div class="card-body">
+    <form method="POST" class="w-100">
+      {{ form.hidden_tag() }}
 
-    <p class="mb-3 col-2">
-      {{ field.label }}
-      {{ field }}
+      {% for field in form
+            if field.widget.input_type != 'hidden' %}
 
-      {% for error in field.errors %}
-        {{ error }}
+        <p class="mb-3 w-75">
+          {{ field.label }}
+          {{ field(class='w-100') }}
+
+          {% for error in field.errors %}
+            {{ error }}
+          {% endfor %}
+        </p>
+
       {% endfor %}
-    </p>
 
-  {% endfor %}
+      <p class="text-secondary">Don't have an account?
+        <a href="/signup" class="text-primary">
+          Sign up
+        </a>
+      </p>
 
-  <p class="text-secondary">Don't have an account?
-    <a href="/signup" class="text-primary">
-      Sign up
-    </a>
-  </p>
-
-  <button type="submit" class="btn btn-primary">Submit</button>
-</form>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </div>
+</div>
 {% endblock %}

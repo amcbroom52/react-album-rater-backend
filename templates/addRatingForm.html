@@ -3,32 +3,53 @@
 {% block title %} Login {% endblock %}
 
 {% block content %}
-<img src="{{album.image_url}}" alt="{{album.name}}" class="h-25 w-25">
-<h1>{{ album.name }}</h1>
+<div class="col-10 mt-3" style="margin: auto;">
 
-<h3>By: {{album.artist_name}}</h3>
+  <img src="{{album.image_url}}" alt="{{album.name}}" class="h-25 w-25 mb-3" style="display: inline-block;">
+  <div style="display: inline-block; position: relative; height: 100px;" class="col-7 ms-3">
+    <h1>{{ album.name }}</h1>
 
-<form method="POST">
-  {{ form.hidden_tag() }}
-
-  {{ form.rating.label(class="form-label")}}
-  <i class="bi bi-star-fill text-primary"></i>: <br>
-
-  <div class="btn-group col-6 mb-3" role="group">
-  {% for subfield in form.rating %}
-    {{subfield(class="btn-check")}}
-    {{subfield.label(class="btn btn-outline-primary")}}
-  {% endfor %}
+    <h3>By:
+      {% for artist in album.artists %}
+        {% if album.artists |length == loop.index %}
+        <a href="/artists/{{artist.id}}" class="text-light">
+          {{artist.name}}
+        </a>
+        {% else %}
+        <a href="/artists/{{artist.id}}" class="text-light">
+          {{artist.name}}
+        </a>,
+        {% endif %}
+      {% endfor %}
+    </h3>
   </div>
 
-  <div class="mb-3">
-  {{form.favorite_song.label(class="form-label")}}
-  {{form.favorite_song(class="form-select bg-dark text-light")}}
+</div>
+
+<div class="card border-primary mb-3 text-light col-9" style="background-color: rgba(38, 39, 48, 0.141); margin: auto;">
+  <div class="card-body">
+    <form method="POST">
+      {{ form.hidden_tag() }}
+
+      {{ form.rating.label(class="form-label")}}
+      <i class="bi bi-star-fill text-primary"></i>: <br>
+      <div class="btn-group col-6 mb-3" role="group">
+      {% for subfield in form.rating %}
+        {{subfield(class="btn-check")}}
+        {{subfield.label(class="btn btn-outline-primary")}}
+      {% endfor %}
+      </div>
+
+      <div class="mb-3">
+      {{form.favorite_song.label(class="form-label")}}
+      {{form.favorite_song(class="form-select bg-dark text-light")}}
+      </div>
+
+      {{form.text.label(class="form-label")}}
+      {{form.text(class="form-control bg-dark text-light")}}
+
+      <button type="submit" class="btn btn-primary mt-3">Submit</button>
+    </form>
   </div>
-
-  {{form.text.label(class="form-label")}}
-  {{form.text(class="form-control bg-dark text-light")}}
-
-  <button type="submit" class="btn btn-primary">Submit</button>
-</form>
+</div>
 {% endblock %}

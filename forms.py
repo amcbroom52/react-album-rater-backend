@@ -35,14 +35,14 @@ class SignupForm(FlaskForm):
         validators=[Length(max=25), Optional()]
     )
 
-    bio = TextAreaField(
-        "Bio (Optional)"
-    )
+    # bio = TextAreaField(
+    #     "Bio (Optional)"
+    # )
 
-    image_url = StringField(
-        "Image URL (Optional)",
-        validators=[URL(), Length(max=255), Optional()]
-    )
+    # image_url = StringField(
+    #     "Image URL (Optional)",
+    #     validators=[URL(), Length(max=255), Optional()]
+    # )
 
     password = PasswordField(
         "Password",
@@ -86,7 +86,7 @@ class AddRatingForm(FlaskForm):
         "Favorite Song (Optional)"
     )
 
-    text = TextAreaField("Thoughts")
+    text = TextAreaField("Thoughts (Optional)")
 
 
 

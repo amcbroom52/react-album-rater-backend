@@ -49,12 +49,16 @@ function addResultsToPage(results, searchType) {
 
 function generateUserSearchHTML(user) {
   const $html = $(
-    `<div>
-      <img src='${user.image_url}' style='height: 100px; width: 100px; border-radius: 50%;'>
-      <h3>
-        <a href='/users/${user.username}' class='text-light'>${user.first_name} ${user.last_name || ""}</a>
-      </h3>
-      <p>${user.username}</p>
+    `<div class="card border-primary mb-5 col-9" style="background-color: rgba(38, 39, 48, 0.141); margin: auto;">
+      <div class="card-body border-primary" onclick="location.href='/users/${user.username}';" style="cursor: pointer;">
+        <img src='${user.image_url}' style='height: 100px; width: 100px; border-radius: 50%; display: inline-block;'>
+        <div style='display: inline-block;' class='ms-2'>
+          <h3 class="text-light">
+            ${user.first_name} ${user.last_name || ""}
+          </h3>
+          <p class="text-body">${user.username}</p>
+        </div>
+      </div>
     </div>`
   );
 
@@ -64,11 +68,15 @@ function generateUserSearchHTML(user) {
 
 function generateArtistSearchHTML(artist) {
   const $html = $(
-    `<div>
-      <img src='${artist.image_url}' style='height: 100px; width: 100px; border-radius: 50%;'>
-      <h3>
-        <a href='/artists/${artist.id}' class='text-light'>${artist.name}</a>
-      </h3>
+    `<div class="card border-primary mb-5 col-10" style="background-color: rgba(38, 39, 48, 0.141); margin: auto;">
+      <div class="card-body border-primary" onclick="location.href='/artists/${artist.id}';" style="cursor: pointer;">
+        <img src='${artist.image_url}' style='height: 100px; width: 100px; border-radius: 50%;'>
+        <div style="display: inline-block" class="ms-2">
+          <h3 class='text-light'>
+            ${artist.name}
+          </h3>
+        </div>
+      </div>
     </div>`
   );
 
@@ -78,14 +86,18 @@ function generateArtistSearchHTML(artist) {
 
 function generateAlbumSearchHTML(album) {
   const $html = $(
-    `<div>
-      <img src='${album.image_url}' style='height: 100px; width: 100px;'>
-      <h3>
-        <a href='/albums/${album.id}' class='text-light'>${album.name}</a>
-      </h3>
-      <p class='text-secondary'>
-        By: <a href='/artists/${album.artist_id}'><i class='text-secondary'>${album.artist}</i></a>
-      </p>
+    `<div class="card border-primary mb-5 col-10" style="background-color: rgba(38, 39, 48, 0.141); margin: auto;">
+      <div class="card-body border-primary" onclick="location.href='/albums/${album.id}';" style="cursor: pointer;">
+        <img src='${album.image_url}' style='height: 100px; width: 100px; display: inline-block'>
+        <div style="display: inline-block" class="ms-2">
+          <h3 class='text-light'>
+            ${album.name}
+          </h3>
+          <p class='text-secondary'>
+            By: <a href='/artists/${album.artist_id}'><i class='text-secondary'>${album.artist}</i></a>
+          </p>
+        </div>
+      </div>
     </div>`
   );
 

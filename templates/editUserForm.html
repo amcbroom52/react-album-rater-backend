@@ -3,24 +3,31 @@
 {% block title %} Signup {% endblock %}
 
 {% block content %}
-<form method="POST">
-  {{ form.hidden_tag() }}
 
-  {% for field in form
-         if field.widget.input_type != 'hidden' %}
+<h1 style="text-align: center;" class="text-primary mt-1">Edit Your Profile</h1>
 
-    <p class="mb-3 col-2">
-      {{ field.label }}
-      {{ field }}
+<div class="card border-primary mb-3 mt-1 text-light col-8 col-sm-3" style="background-color: rgba(38, 39, 48, 0.141); margin: auto;">
+  <div class="card-body">
+    <form method="POST">
+      {{ form.hidden_tag() }}
 
-      {% for error in field.errors %}
-        {{ error }}
+      {% for field in form
+            if field.widget.input_type != 'hidden' %}
+
+        <p class="mb-2 w-75">
+          {{ field.label }}
+          {{ field(class='w-100') }}
+
+          {% for error in field.errors %}
+            {{ error }}
+          {% endfor %}
+        </p>
+
       {% endfor %}
-    </p>
 
-  {% endfor %}
-
-  <button type="submit" class="btn btn-primary">Submit</button>
-  <button formaction="/delete-user" formmethod="POST" class="btn btn-outline-danger" style="position:fixed; right: 10px;">DELETE ACCOUNT</button>
-</form>
+      <button type="submit" class="btn btn-primary">Submit</button>
+      <button formaction="/delete-user" formmethod="POST" class="btn btn-outline-danger">DELETE ACCOUNT</button>
+    </form>
+  </div>
+</div>
 {% endblock %}

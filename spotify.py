@@ -45,9 +45,11 @@ def get_album_info(id, token):
         "id": id,
         "name": all_data["name"],
         "image_url": all_data["images"][0]["url"],
-        "artist_name": all_data["artists"][0]["name"],
-        "artist_id": all_data["artists"][0]["id"],
-        "tracks": all_data["tracks"]["items"]
+        "tracks": all_data["tracks"]["items"],
+        "artists": [{
+            'name': artist['name'],
+            'id': artist['id']
+            } for artist in all_data["artists"]],
     }
 
     return required_data
