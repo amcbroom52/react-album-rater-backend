@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %} {% endblock %}</title>
+  <script src="https://unpkg.com/jquery"></script>
+  <link
+      href="https://bootswatch.com/5/pulse/bootstrap.css"
+      rel="stylesheet">
+  <link
+      rel="stylesheet"
+      href="https://www.unpkg.com/bootstrap-icons/font/bootstrap-icons.css">
+</head>
+
+{% for category, message in get_flashed_messages(with_categories=True) %}
+<div class="alert alert-{{ category }}">{{ message }}</div>
+{% endfor %}
+
+<nav class="navbar navbar-expand bg-primary mb-5" data-bs-theme="dark">
+  <div class="container-fluid">
+    <ul class="navbar-nav me-auto">
+      <li class="nav-item">
+        <a class="nav-link active" href="/">Home
+          <span class="visually-hidden">(current)</span>
+        </a>
+      </li>
+    </ul>
+    <ul class="navbar-nav ms-auto">
+      <li class="nav-item">
+        <a class="nav-link active" href="/search"> Search
+          <span class="visually-hidden">(current)</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link active" href="/users/{{g.user.username}}">My Profile
+          <span class="visually-hidden">(current)</span>
+        </a>
+      </li>
+      <li>
+        <form action="/logout" method="POST">
+          {{ g.csrf_form.hidden_tag() }}
+          <button class="btn btn-dark" type="submit" style="border-radius: 10px;">Log Out</button>
+        </form>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+
+<body class="bg-dark text-light">
+  {% block content %}
+  {% endblock %}
+</body>
+
+</html>

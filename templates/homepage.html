@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% from 'rating.html' import show_rating with context%}
+
+{% block content %}
+
+{% for rating in ratings %}
+
+{{ show_rating(rating) }}
+
+{% endfor %}
+
+{% endblock %}

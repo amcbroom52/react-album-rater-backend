@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% from 'rating.html' import show_rating with context%}
+
+{% block content %}
+
+<div class="col-10 mt-3" style="margin: auto;">
+
+  <img src="{{album.image_url}}" alt="{{album.name}}" class="h-25 w-25 mb-3" style="display: inline-block;">
+  <div style="display: inline-block; position: relative; height: 100px;" class="col-6">
+    <h1>{{ album.name }}</h1>
+
+    <h3>By:
+      <a href="/artists/{{album.artist_id}}" class="text-light">
+        {{album.artist_name}}
+      </a>
+    </h3>
+
+    <a
+    href="/rate-album/{{album.id}}"
+    class="btn btn-outline-primary"
+    style="
+      border-radius: 20px;
+      position: relative;
+      /* left: 90%; */
+      top: 50%;
+      ">
+      Rate Album
+    </a>
+  </div>
+
+</div>
+
+<div class="mb-5">
+  {% for song in album.tracks %}
+  <div style="background-color: rgba(38, 39, 48, 0.141); border-radius: 5px; margin: auto; display: flex; justify-content: space-between;" class="pt-1 pb-1 col-9">
+    <span class="ms-2">
+      {{song.track_number}}. {{song.name}}
+    </span>
+    <span class="text-body me-2">
+      {{song.duration_ms |format_runtime}}
+    </span>
+  </div><br>
+
+  {% endfor %}
+</div>
+
+<hr class="col-11 mb-5" style="margin: auto;">
+
+{%for rating in ratings%}
+
+{{ show_rating(rating) }}
+
+{%endfor%}
+
+{% endblock %}

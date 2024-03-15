@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="col-10 mt-3" style="margin: auto; position: relative;">
+
+  <p style="position: absolute; top: 10px; right: 10px;" class="text-body">
+    {{rating.timestamp.strftime('%b %d %Y, %H:%M')}}
+  </p>
+
+  <img src="{{rating.album.image_url}}" alt="{{rating.album.name}}" class="h-25 w-25 mb-3" style="display: inline-block;">
+  <div style="display: inline-block; position: relative; height: 100px;" class="col-6">
+    <h1>
+      <a href="/albums/{{rating.album.id}}" class="text-light">
+      {{ rating.album.name }}
+      </a>
+    </h1>
+
+    <h3>By:
+      <a href="/artists/{{rating.album.artist_id}}" class="text-light">
+        {{rating.album.artist_name}}
+      </a>
+    </h3>
+
+    {% if rating.author == g.user.username %}
+
+
+
+    <form>
+      {{ g.csrf_form.hidden_tag() }}
+      <button type="submit" formaction="/edit-rating/{{rating.album.id}}" class="btn btn-outline-primary" style="
+      border-radius: 20px;">
+        Edit
+      </button>
+
+      <button type="submit" formaction="/delete-rating/{{rating.id}}" formmethod="POST" class="btn btn-outline-danger" style="
+        border-radius: 20px;">
+        Delete
+      </button>
+    </form>
+
+    {% endif %}
+
+  </div>
+
+
+
+  <div>
+    {% for star in range(5) %}
+      <span class="text-secondary" style="font-size:x-large;">
+        {% if rating.rating > star and (star + 1) > (rating.rating) %}
+        <i class="bi bi-star-half"></i>
+        {% elif rating.rating > star and (rating.rating >= (star + 1)) %}
+        <i class="bi bi-star-fill"></i>
+        {% else %}
+        <i class="bi bi-star"></i>
+        {% endif %}
+      </span>
+    {% endfor %}
+
+    {% if rating.favorite_song %}
+      <span class="ms-2 text-secondary" style="font-size: x-large;">
+        Favorite Song: {{rating.favorite_song}}
+      </span>
+    {% endif %}
+
+  </div>
+
+  <h4 class="card-text">{{rating.text}}</h4>
+
+  <div class="card-header bg-dark">
+    <h5 class="text-body mb-0">Posted By:
+      <a href="/users/{{rating.author}}" class="text-body">
+        {{rating.author}}
+      </a>
+    </h5>
+  </div>
+
+
+</div>
+
+{% endblock %}

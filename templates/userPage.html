@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% from 'rating.html' import show_rating with context%}
+
+{% block title %} user.username {% endblock %}
+
+{% block content %}
+
+<div class="col-10 mt-3" style="margin: auto;">
+  <img src="{{user.image_url}}" alt="{{user.username}} Image" class="w-25"
+    style="border-radius: 50%; display: inline-block;">
+
+  <div style="display: inline-block;" class="ms-3 pt-3">
+    <h1>{{user.first_name}} {{user.last_name or ""}}</h1>
+    <h3 class="text-body-secondary">{{user.username}}</h3>
+
+    {% if user.username == g.user.username %}
+
+    <a href="/edit-user" class="btn btn-outline-primary" style="
+        border-radius: 20px;
+        position: relative;
+        /* left: 90%; */
+        top: 50%;
+        ">
+      Edit
+    </a>
+
+    {% elif g.user.is_following(user) %}
+
+    <form action="/follow-user/{{user.username}}" method="POST">
+      {{ g.csrf_form.hidden_tag() }}
+      <button type="submit" class="btn btn-primary" style="
+        border-radius: 20px;
+        position: relative;
+        /* left: 90%; */
+        top: 50%;
+        ">
+        Unfollow
+      </button>
+
+    </form>
+
+    {% else %}
+
+    <form action="/follow-user/{{user.username}}" method="POST">
+      {{ g.csrf_form.hidden_tag() }}
+      <button type="submit" class="btn btn-outline-primary" style="
+          border-radius: 20px;
+          position: relative;
+          /* left: 90%; */
+          top: 50%;
+          ">
+        Follow
+      </button>
+
+    </form>
+
+    {% endif %}
+  </div>
+</div>
+
+<p>{{user.bio or ''}}</p>
+
+{%for rating in user.ratings%}
+
+{{ show_rating(rating) }}
+
+{%endfor%}
+
+{% endblock %}

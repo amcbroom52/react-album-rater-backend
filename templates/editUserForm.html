@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %} Signup {% endblock %}
+
+{% block content %}
+<form method="POST">
+  {{ form.hidden_tag() }}
+
+  {% for field in form
+         if field.widget.input_type != 'hidden' %}
+
+    <p class="mb-3 col-2">
+      {{ field.label }}
+      {{ field }}
+
+      {% for error in field.errors %}
+        {{ error }}
+      {% endfor %}
+    </p>
+
+  {% endfor %}
+
+  <button type="submit" class="btn btn-primary">Submit</button>
+  <button formaction="/delete-user" formmethod="POST" class="btn btn-outline-danger" style="position:fixed; right: 10px;">DELETE ACCOUNT</button>
+</form>
+{% endblock %}

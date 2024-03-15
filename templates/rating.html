@@ -1,0 +1,54 @@
+{% macro show_rating(rating) %}
+
+<div class="card border-primary mb-3 text-light col-9" style="background-color: rgba(38, 39, 48, 0.141); margin: auto;">
+  <div class="card-body" onclick="location.href='/ratings/{{rating.id}}';" style="cursor: pointer;">
+    <p style="position: absolute; top: 10px; right: 10px;" class="text-body">
+      {{rating.timestamp.strftime('%b %d %Y, %H:%M')}}
+    </p>
+    <img src="{{rating.album.image_url}}" alt="{{rating.album.name}}" class="col-2" style="display: inline-block">
+    <div style="display: inline-block;">
+      <h4>
+        <a href="/albums/{{rating.album.id}}" class="card-title">
+        {{ rating.album.name }}
+        </a>
+      </h4>
+      <p class="text-secondary">
+        By: <a href="/artists/{{rating.album.artist_id}}" class="text-secondary">
+          {{rating.album.artist_name}}
+        </a>
+      </p>
+
+    </div>
+
+
+    <div>
+      {% for star in range(5) %}
+        <span class="text-secondary">
+          {% if rating.rating > star and (star + 1) > (rating.rating) %}
+          <i class="bi bi-star-half"></i>
+          {% elif rating.rating > star and (rating.rating >= (star + 1)) %}
+          <i class="bi bi-star-fill"></i>
+          {% else %}
+          <i class="bi bi-star"></i>
+          {% endif %}
+        </span>
+      {% endfor %}
+
+      {% if rating.favorite_song %}
+        <span class="ms-2 text-secondary">Favorite Song: {{rating.favorite_song}}</span>
+      {% endif %}
+
+      </div>
+
+    <p class="card-text">{{rating.text}}</p>
+  </div>
+  <div class="card-header bg-dark">
+    <p class="text-body mb-0">Posted By:
+      <a href="/users/{{rating.author}}" class="text-body">
+        {{rating.author}}
+      </a>
+    </p>
+  </div>
+</div>
+
+{% endmacro %}

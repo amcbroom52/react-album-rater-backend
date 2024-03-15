@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %} Search {% endblock %}
+
+{% block content %}
+
+<form id="search-form">
+  <input type="text" placeholder="Search..." class="form-control bg-dark text-light" required>
+  <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+    <input type="radio" class="btn-check" name="search-type" id="btnradio1" checked="" required value="album">
+    <label class="btn btn-outline-primary" for="btnradio1">Albums</label>
+    <input type="radio" class="btn-check" name="search-type" id="btnradio2" value="artist">
+    <label class="btn btn-outline-primary" for="btnradio2">Artists</label>
+    <input type="radio" class="btn-check" name="search-type" id="btnradio3" value="user">
+    <label class="btn btn-outline-primary" for="btnradio3">Users</label>
+  </div>
+  <button type="submit" class="bg-dark"><i class="bi bi-search text-light"></i></button>
+</form>
+
+<div id="search-results">
+
+</div>
+
+<script src="static/search.js"></script>
+
+{% endblock %}
