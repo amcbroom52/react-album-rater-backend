@@ -359,8 +359,8 @@ def handle_rating_form(album_id):
                 id=album['id'],
                 name=album['name'],
                 image_url=album['image_url'],
-                artist_name=album['artist_name'],
-                artist_id=album['artist_id']
+                artist_name=album['artists'][0]['name'],
+                artist_id=album['artists'][0]['id']
             )
 
             db.session.add(db_album)

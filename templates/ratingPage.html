@@ -26,7 +26,13 @@
 
 
 
-    <form>
+    <form style="
+    border-radius: 20px;
+    position: absolute;
+    bottom: -80%;
+    /* right: 5%; */
+    left: 0%;
+    ">
       {{ g.csrf_form.hidden_tag() }}
       <button type="submit" formaction="/edit-rating/{{rating.album.id}}" class="btn btn-outline-primary" style="
       border-radius: 20px;">
