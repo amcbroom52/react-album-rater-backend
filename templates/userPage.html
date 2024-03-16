@@ -11,7 +11,7 @@
 
   <div style="display: inline-block;" class="ms-3 pt-3">
     <h1>{{user.first_name}} {{user.last_name or ""}}</h1>
-    <h3 class="text-body-secondary">{{user.username}}</h3>
+    <h3 class="text-body-secondary" id="username">{{user.username}}</h3>
 
     {% if user.username == g.user.username %}
 
@@ -60,11 +60,16 @@
   <p class="col-10 mt-1" style="margin: auto;">{{user.bio or ''}}</p>
 </div>
 
+<div id="show-ratings">
 
-{%for rating in user.ratings%}
+</div>
+<!-- {%for rating in user.ratings%}
 
 {{ show_rating(rating) }}
 
-{%endfor%}
+{%endfor%} -->
+
+
+<script src="/static/userPage.js"></script>
 
 {% endblock %}

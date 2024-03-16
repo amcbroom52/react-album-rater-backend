@@ -1,31 +1,60 @@
 "use strict";
 
-const $resultContainer = $("#search-results")
+const $resultContainer = $("#search-results");
 
-async function getSearchResults(evt) {
+let offsetAmount = 0;
+let loaded = true;
+let endOfItems = false;
+
+let searchInput;
+let searchType;
+
+
+async function handleSubmit(evt) {
   evt.preventDefault();
 
-  const searchInput = $("#search-form input").val();
-  const searchType = $("#search-form input[name='search-type']:checked").val();
+  searchInput = $("#search-form input").val();
+  searchType = $("#search-form input[name='search-type']:checked").val();
+  offsetAmount = 0;
+
+  $resultContainer.empty();
+  await getSearchResults();
+}
+
+async function handleScroll() {
+  if (!endOfItems){
+    let height = $(document).height();
+    let position = $(window).height() + $(window).scrollTop();
+
+    if ((height - position) <= 500 && loaded) {
+      loaded = false;
+      await getSearchResults();
+    }
+
+    if ((height - position) > 500) loaded = true;
+  }
+}
+
+
+async function getSearchResults() {
 
   const params = new URLSearchParams({
     'query': searchInput,
-    'type': searchType
+    'type': searchType,
+    'offset': offsetAmount
   });
 
   const resp = await fetch(`/search/results?${params}`);
   const searchResults = await resp.json();
 
-  console.log(searchInput);
-  console.log(searchType);
-
   addResultsToPage(searchResults, searchType);
+
+  offsetAmount += 20;
 
 }
 
 
 function addResultsToPage(results, searchType) {
-  $resultContainer.empty();
 
   if (searchType === "album") {
     for (let album of results) {
@@ -104,4 +133,5 @@ function generateAlbumSearchHTML(album) {
   return $html;
 }
 
-$("#search-form").on("submit", getSearchResults);
+$("#search-form").on("submit", handleSubmit);
+$(window).on('scroll', handleScroll);

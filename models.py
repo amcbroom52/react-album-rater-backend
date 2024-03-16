@@ -156,13 +156,17 @@ class User(db.Model):
         return False
 
     @classmethod
-    def search(cls, search):
+    def search(cls, search, offset):
         """Searches for users in the database that match the search string"""
 
-        users = cls.query.filter(or_(
-                        cls.username.ilike(f'%{search}%'),
-                        cls.first_name.ilike(f"%{search}%"),
-                        cls.last_name.ilike(f'%{search}%'))).all()
+        users = (cls
+                .query
+                .filter(or_(
+                     cls.username.ilike(f'%{search}%'),
+                     cls.first_name.ilike(f"%{search}%"),
+                     cls.last_name.ilike(f'%{search}%')
+                )).limit(20)
+                .offset(offset))
 
         return users
 
@@ -214,6 +218,17 @@ class Rating(db.Model):
         db.ForeignKey('users.username', ondelete="cascade"),
         nullable=False
     )
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'rating': self.rating,
+            'favorite_song': self.favorite_song,
+            'text': self.text,
+            'timestamp': self.timestamp,
+            'album_id': self.album_id,
+            'author': self.author
+        }
 
     # @classmethod
     # def create_rating(cls, )

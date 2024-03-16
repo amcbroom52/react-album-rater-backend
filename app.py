@@ -1,8 +1,9 @@
 import os
 
-from flask import Flask, render_template, session, redirect, flash, g, url_for, request, jsonify
+from flask import Flask, render_template, session, redirect, flash, g, url_for, request, jsonify, get_template_attribute
 from models import connect_db, db,  User, Rating, Album, DEFAULT_USER_IMAGE
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import or_
 from forms import LoginForm, SignupForm, CSRFProtectForm, EditRatingForm, AddRatingForm, EditUserForm
 from spotify import get_access_token, get_album_info, album_search, artist_search, get_artist_info
 from functools import wraps
@@ -187,17 +188,18 @@ def get_search_results():
 
     query = request.args.get("query", "a")
     search_type = request.args.get("type", "album")
+    offset = request.args.get('offset')
 
     # results = []
 
     if search_type == "album":
-        results = album_search(query=query, token=g.spotify_token['token'])
+        results = album_search(query=query, offset=offset, token=g.spotify_token['token'])
 
     elif search_type == "artist":
-        results = artist_search(query=query, token=g.spotify_token['token'])
+        results = artist_search(query=query, offset=offset, token=g.spotify_token['token'])
 
     elif search_type == "user":
-        unserialized_results = User.search(search=query)
+        unserialized_results = User.search(search=query, offset=offset)
         results = [user.serialize() for user in unserialized_results]
 
     return jsonify(results)
@@ -416,4 +418,31 @@ def delete_rating(rating_id):
 
     return redirect(url_for('show_album', album_id=rating.album_id))
 
+@app.get('/ratings/load')
+@login_required
+def load_ratings():
 
+    user = request.args.get('user', '')
+    album_id = request.args.get('albumId', '')
+    homepage = request.args.get('homepage')
+    offset = request.args.get('offset', 0)
+
+    if homepage:
+        usernames = [user.username for user in g.user.following] + [g.user.username]
+    else:
+        usernames = [user]
+
+    ratings = (Rating
+                .query
+                .filter(or_(
+                    Rating.author.in_(usernames),
+                    Rating.album_id == album_id
+                )).order_by(Rating.timestamp.desc())
+                .limit(10)
+                .offset(offset)
+                .all())
+
+    get_rating_html = get_template_attribute('rating.html', 'show_rating')
+    rating_htmls = [get_rating_html(rating) for rating in ratings]
+
+    return jsonify(rating_htmls)

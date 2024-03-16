@@ -104,12 +104,14 @@ def get_artist_info(id, token):
     return return_data
 
 
-def album_search(query, token):
+def album_search(query, offset, token):
     """Uses spotify API to search for albums"""
 
     params = {
         'q': query,
-        'type': 'album'
+        'type': 'album',
+        'limit': 20,
+        'offset': offset
     }
 
     resp = requests.get(
@@ -133,12 +135,14 @@ def album_search(query, token):
     return data
 
 
-def artist_search(query, token):
+def artist_search(query, offset, token):
     """Uses spotify API to search for artists"""
 
     params = {
         'q': query,
-        'type': 'artist'
+        'type': 'artist',
+        'limit': 20,
+        'offset': offset
     }
 
     resp = requests.get(

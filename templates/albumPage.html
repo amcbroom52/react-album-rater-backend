@@ -3,6 +3,8 @@
 
 {% block content %}
 
+<div hidden id="album-id">{{album.id}}</div>
+
 <div class="col-10 mt-3" style="margin: auto; position: relative;">
 
   <img src="{{album.image_url}}" alt="{{album.name}}" class="h-25 w-25 mb-3" style="display: inline-block;">
@@ -55,10 +57,14 @@
 
 <hr class="col-11 mb-5" style="margin: auto;">
 
-{%for rating in ratings%}
+<div id="show-ratings"></div>
+
+<!-- {%for rating in ratings%}
 
 {{ show_rating(rating) }}
 
-{%endfor%}
+{%endfor%} -->
+
+<script src="/static/albumPage.js"></script>
 
 {% endblock %}
