@@ -6,7 +6,20 @@
 
 <form id="search-form" class="col-9 mt-5" style="margin: auto;">
   <div style="position: relative;" class="mb-3">
-    <input type="text" placeholder="Search..." class="form-control bg-dark text-light" style="display: inline-block; border-radius: 40px;" required>
+
+    {{form.search(placeholder="Search...", autocomplete='off', class="form-control bg-dark text-light", style="display: inline-block; border-radius: 40px;")}}
+    <button type="submit"
+      class="bg-dark h-75"
+      style="position: absolute; top: 13%; right: 10px; border: none;">
+      <i class="bi bi-search text-light"></i>
+    </button>
+  </div>
+  <div class="btn-group col-5" role="group" aria-label="Basic radio toggle button group" style="margin: auto;">
+    {% for subfield in form.searchType %}
+      {{subfield(class="btn-check")}}
+      {{subfield.label(class="btn btn-outline-primary")}}
+    {% endfor %}
+    <!-- <input type="text" placeholder="Search..." class="form-control bg-dark text-light" style="display: inline-block; border-radius: 40px;" required>
     <button type="submit"
       class="bg-dark h-75"
       style="position: absolute; top: 13%; right: 10px; border: none;">
@@ -19,7 +32,7 @@
     <input type="radio" class="btn-check" name="search-type" id="btnradio2" value="artist">
     <label class="btn btn-outline-primary" for="btnradio2">Artists</label>
     <input type="radio" class="btn-check" name="search-type" id="btnradio3" value="user">
-    <label class="btn btn-outline-primary" for="btnradio3">Users</label>
+    <label class="btn btn-outline-primary" for="btnradio3">Users</label> -->
   </div>
 </form>
 

@@ -4,6 +4,8 @@
 
 {% block content %}
 
+<div hidden id="artist-id">{{artist.id}}</div>
+
 <div class="col-10 mt-3" style="margin: auto;">
 
   <img src="{{artist.image_url}}" alt="{{artist.name}} Image" class="w-25 h-25" style="border-radius: 1500px; display: inline-block;">
@@ -19,9 +21,9 @@
 </div>
 
 
-<div class="mt-5">
+<div class="mt-5" id="show-albums">
 
-{% for album in artist.albums %}
+<!-- {% for album in artist.albums %}
 
   <div class="card border-primary mb-5 col-9" style="background-color: rgba(38, 39, 48, 0.141); margin: auto;">
     <div class="card-body border-primary" onclick="location.href='/albums/{{album.id}}';" style="cursor: pointer;">
@@ -37,10 +39,10 @@
     </div>
   </div>
 
-{% endfor %}
+{% endfor %} -->
 
 </div>
 
-
+<script src="/static/artistPage.js"></script>
 
 {% endblock %}

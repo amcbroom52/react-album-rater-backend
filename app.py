@@ -4,8 +4,8 @@ from flask import Flask, render_template, session, redirect, flash, g, url_for, 
 from models import connect_db, db,  User, Rating, Album, DEFAULT_USER_IMAGE
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import or_
-from forms import LoginForm, SignupForm, CSRFProtectForm, EditRatingForm, AddRatingForm, EditUserForm
-from spotify import get_access_token, get_album_info, album_search, artist_search, get_artist_info
+from forms import LoginForm, SignupForm, CSRFProtectForm, EditRatingForm, AddRatingForm, EditUserForm, SearchForm
+from spotify import get_access_token, get_album_info, album_search, artist_search, get_artist_info, get_artists_albums
 from functools import wraps
 from dotenv import load_dotenv
 from datetime import datetime
@@ -94,7 +94,7 @@ def do_logout():
     if CURR_USER_KEY in session:
         del session[CURR_USER_KEY]
 
-################################### Base Pages #################################
+################################# Base Routes ##################################
 
 @app.get('/')
 def homepage():
@@ -176,7 +176,12 @@ def handle_signup_form():
 def search_items():
     """Search for albums or artists on spotify"""
 
-    return render_template('search.html')
+    form = SearchForm(obj={
+        'searchType': 'album',
+        'search': None
+    })
+
+    return render_template('search.html', form=form)
 
 
 @app.get('/search/results')
@@ -189,8 +194,6 @@ def get_search_results():
     query = request.args.get("query", "a")
     search_type = request.args.get("type", "album")
     offset = request.args.get('offset')
-
-    # results = []
 
     if search_type == "album":
         results = album_search(query=query, offset=offset, token=g.spotify_token['token'])
@@ -307,6 +310,24 @@ def show_album(album_id):
     ratings = Rating.query.filter_by(album_id=album_id).all()
 
     return render_template("albumPage.html", album=album, ratings=ratings)
+
+
+@app.get('/artists/<artist_id>/albums')
+@login_required
+@token_required
+def request_artists_albums(artist_id):
+    """Takes an artist id as a parameter and an offset amount as a query string
+    and returns JSON of that artists albums"""
+
+    offset = request.args.get('offset', 0)
+
+    albums = get_artists_albums(
+        artist_id=artist_id,
+        offset=offset,
+        token=g.spotify_token['token']
+    )
+
+    return jsonify(albums)
 
 
 

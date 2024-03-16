@@ -14,8 +14,9 @@ async function handleSubmit(evt) {
   evt.preventDefault();
 
   searchInput = $("#search-form input").val();
-  searchType = $("#search-form input[name='search-type']:checked").val();
+  searchType = $("#search-form input[name='searchType']:checked").val();
   offsetAmount = 0;
+  endOfItems = false;
 
   $resultContainer.empty();
   await getSearchResults();
@@ -46,6 +47,8 @@ async function getSearchResults() {
 
   const resp = await fetch(`/search/results?${params}`);
   const searchResults = await resp.json();
+
+  console.log(searchResults);
 
   addResultsToPage(searchResults, searchType);
 

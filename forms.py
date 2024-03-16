@@ -35,15 +35,6 @@ class SignupForm(FlaskForm):
         validators=[Length(max=25), Optional()]
     )
 
-    # bio = TextAreaField(
-    #     "Bio (Optional)"
-    # )
-
-    # image_url = StringField(
-    #     "Image URL (Optional)",
-    #     validators=[URL(), Length(max=255), Optional()]
-    # )
-
     password = PasswordField(
         "Password",
         validators=[InputRequired(), Length(min=6)]
@@ -105,6 +96,19 @@ class EditRatingForm(FlaskForm):
     )
 
     text = TextAreaField("Thoughts")
+
+class SearchForm(FlaskForm):
+    """Form for searching items"""
+
+    search = StringField(
+        validators=[InputRequired()]
+    )
+
+    searchType = RadioField(
+        choices=[('album', 'Albums'), ('artist', 'Artists'), ('user', 'Users')],
+        default='album',
+        validators=[InputRequired(), AnyOf(['album', 'artist', 'user'])]
+    )
 
 
 

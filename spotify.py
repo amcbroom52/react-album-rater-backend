@@ -76,21 +76,21 @@ def get_artist_info(id, token):
     })
     all_artist_data = resp.json()
 
-    resp = requests.get(f"{BASE_API_URL}/artists/{id}/albums",
-    headers={
-        "Authorization": token
-    }, params= {
-        'limit': 30
-    })
-    all_album_data = resp.json()
+    # resp = requests.get(f"{BASE_API_URL}/artists/{id}/albums",
+    # headers={
+    #     "Authorization": token
+    # }, params= {
+    #     'limit': 30
+    # })
+    # all_album_data = resp.json()
 
-    album_data = [{
-        'name': album['name'],
-        'release_date': album['release_date'],
-        'image_url': album['images'][0]['url'],
-        'id': album['id']
-    } for album in all_album_data['items']
-    if album['total_tracks'] >= 4]
+    # album_data = [{
+    #     'name': album['name'],
+    #     'release_date': album['release_date'],
+    #     'image_url': album['images'][0]['url'],
+    #     'id': album['id']
+    # } for album in all_album_data['items']
+    # if album['total_tracks'] >= 4]
 
     return_data = {
         'name': all_artist_data['name'],
@@ -98,10 +98,35 @@ def get_artist_info(id, token):
         'id': all_artist_data['id'],
         'spotify_link': all_artist_data['external_urls']['spotify'],
         'genres': all_artist_data['genres'],
-        'albums': album_data
+        # 'albums': album_data
     }
 
     return return_data
+
+
+def get_artists_albums(artist_id, offset, token):
+    """Uses spotify API to get albums made by a specific artist"""
+
+    resp = requests.get(f"{BASE_API_URL}/artists/{artist_id}/albums",
+    headers={
+        "Authorization": token
+    }, params= {
+        'limit': 10,
+        'offset': offset
+    })
+    all_album_data = resp.json()
+
+    album_data = [{
+        'name': album['name'],
+        'release_year': album['release_date'][0:4],
+        'image_url': album['images'][0]['url'],
+        'id': album['id']
+    } for album in all_album_data['items']
+    if album['total_tracks'] >= 4 and
+    any(artist['id'] == artist_id for artist in album['artists'])]
+
+    return album_data
+
 
 
 def album_search(query, offset, token):
