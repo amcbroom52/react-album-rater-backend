@@ -9,7 +9,7 @@ let endOfItems = false;
 let searchInput;
 let searchType;
 
-
+/**Sets global variables and calls `getSearchResults` */
 async function handleSubmit(evt) {
   evt.preventDefault();
 
@@ -22,6 +22,7 @@ async function handleSubmit(evt) {
   await getSearchResults();
 }
 
+/**Calls `getSearchResults` when user gets to the end of the page*/
 async function handleScroll() {
   if (!endOfItems){
     let height = $(document).height();
@@ -36,7 +37,8 @@ async function handleScroll() {
   }
 }
 
-
+/**Makes API request to the server to get search results and adds results to the
+ * page */
 async function getSearchResults() {
 
   const params = new URLSearchParams({
@@ -48,8 +50,6 @@ async function getSearchResults() {
   const resp = await fetch(`/search/results?${params}`);
   const searchResults = await resp.json();
 
-  console.log(searchResults);
-
   addResultsToPage(searchResults, searchType);
 
   offsetAmount += 20;
@@ -57,6 +57,7 @@ async function getSearchResults() {
 }
 
 
+/**Generates results html and adds them to the page */
 function addResultsToPage(results, searchType) {
 
   if (searchType === "album") {
@@ -78,7 +79,7 @@ function addResultsToPage(results, searchType) {
 
 }
 
-
+/**Generates HTML for searched users */
 function generateUserSearchHTML(user) {
   const $html = $(
     `<div class="card border-primary mb-5 col-9" style="background-color: rgba(38, 39, 48, 0.141); margin: auto;">
@@ -97,7 +98,7 @@ function generateUserSearchHTML(user) {
   return $html;
 }
 
-
+/**Generates HTML for searched artists */
 function generateArtistSearchHTML(artist) {
   const $html = $(
     `<div class="card border-primary mb-5 col-10" style="background-color: rgba(38, 39, 48, 0.141); margin: auto;">
@@ -115,7 +116,7 @@ function generateArtistSearchHTML(artist) {
   return $html;
 }
 
-
+/**Generates HTML for searched albums */
 function generateAlbumSearchHTML(album) {
   const $html = $(
     `<div class="card border-primary mb-5 col-10" style="background-color: rgba(38, 39, 48, 0.141); margin: auto;">

@@ -1,4 +1,4 @@
-"use strict"
+"use strict";
 
 const $showAlbums = $("#show-albums");
 
@@ -6,8 +6,9 @@ let offsetAmount = 0;
 let loaded = true;
 let endOfItems = false;
 
+/**Calls `getAlbums` when user gets to the end of the page */
 async function handleScroll() {
-  if (!endOfItems){
+  if (!endOfItems) {
     let height = $(document).height();
     let position = $(window).height() + $(window).scrollTop();
 
@@ -22,6 +23,7 @@ async function handleScroll() {
 
 $(window).on('scroll', handleScroll);
 
+/**Makes API request to server to recieve Album data and appends it to the page */
 async function getAlbums() {
 
   const artistId = $("#artist-id").text();
@@ -42,6 +44,7 @@ async function getAlbums() {
   offsetAmount += 10;
 }
 
+/**Creates HTML for individual albums */
 function generateAlbumHTML(album) {
   const $html = $(`
     <div class="card border-primary mb-5 col-9" style="background-color: rgba(38, 39, 48, 0.141); margin: auto;">

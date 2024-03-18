@@ -8,11 +8,17 @@
     {{rating.timestamp.strftime('%b %d %Y, %H:%M')}}
   </p>
 
-  <img src="{{rating.album.image_url}}" alt="{{rating.album.name}}" class="h-25 w-25 mb-3" style="display: inline-block;">
-  <div style="display: inline-block; position: relative; height: 100px;" class="col-7 ms-3">
+  <img
+    src="{{rating.album.image_url}}"
+    alt="{{rating.album.name}}"
+    class="h-25 w-25 mb-3"
+    style="display: inline-block;">
+  <div
+    style="display: inline-block; position: relative; height: 100px;"
+    class="col-7 ms-3">
     <h1>
       <a href="/albums/{{rating.album.id}}" class="text-light">
-      {{ rating.album.name }}
+        {{ rating.album.name }}
       </a>
     </h1>
 
@@ -34,13 +40,20 @@
     left: 0%;
     ">
       {{ g.csrf_form.hidden_tag() }}
-      <button type="submit" formaction="/edit-rating/{{rating.album.id}}" class="btn btn-outline-primary" style="
-      border-radius: 20px;">
+      <button
+        type="submit"
+        formaction="/edit-rating/{{rating.album.id}}"
+        class="btn btn-outline-primary"
+        style="border-radius: 20px;">
         Edit
       </button>
 
-      <button type="submit" formaction="/delete-rating/{{rating.id}}" formmethod="POST" class="btn btn-outline-danger" style="
-        border-radius: 20px;">
+      <button
+        type="submit"
+        formaction="/delete-rating/{{rating.id}}"
+        formmethod="POST"
+        class="btn btn-outline-danger"
+        style="border-radius: 20px;">
         Delete
       </button>
     </form>
@@ -53,21 +66,21 @@
 
   <div>
     {% for star in range(5) %}
-      <span class="text-secondary" style="font-size:x-large;">
-        {% if rating.rating > star and (star + 1) > (rating.rating) %}
-        <i class="bi bi-star-half"></i>
-        {% elif rating.rating > star and (rating.rating >= (star + 1)) %}
-        <i class="bi bi-star-fill"></i>
-        {% else %}
-        <i class="bi bi-star"></i>
-        {% endif %}
-      </span>
+    <span class="text-secondary" style="font-size:x-large;">
+      {% if rating.rating > star and (star + 1) > (rating.rating) %}
+      <i class="bi bi-star-half"></i>
+      {% elif rating.rating > star and (rating.rating >= (star + 1)) %}
+      <i class="bi bi-star-fill"></i>
+      {% else %}
+      <i class="bi bi-star"></i>
+      {% endif %}
+    </span>
     {% endfor %}
 
     {% if rating.favorite_song %}
-      <span class="ms-2 text-secondary" style="font-size: x-large;">
-        Favorite Song: {{rating.favorite_song}}
-      </span>
+    <span class="ms-2 text-secondary" style="font-size: x-large;">
+      Favorite Song: {{rating.favorite_song}}
+    </span>
     {% endif %}
 
   </div>

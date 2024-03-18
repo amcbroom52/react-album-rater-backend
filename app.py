@@ -29,6 +29,7 @@ CURR_USER_KEY = "active_user"
 
 ################################### Helpers ####################################
 
+
 @app.before_request
 def add_user_to_g():
     """If we're logged in, add curr user to Flask global."""
@@ -39,14 +40,17 @@ def add_user_to_g():
     else:
         g.user = None
 
+
 @app.before_request
 def add_csrfform_to_g():
-    """If we're logged in, add curr user to Flask global."""
+    """Add CSRF protection form to Flask global."""
 
     g.csrf_form = CSRFProtectForm()
 
 
 def login_required(f):
+    """Decorator to make sure the user is logged in"""
+
     @wraps(f)
     def login_decorator(*args, **kwargs):
         if not g.user:
@@ -57,6 +61,9 @@ def login_required(f):
 
 
 def token_required(f):
+    """Decorator to make sure Spotify API token is still valid, generates new
+    one if not"""
+
     @wraps(f)
     def token_decorator(*args, **kwargs):
         if hasattr(g, 'spotify_token'):
@@ -68,8 +75,10 @@ def token_required(f):
         return f(*args, **kwargs)
     return token_decorator
 
+
 @app.template_filter()
 def format_runtime(milliseconds):
+    """Formats time in milliseconds to min:sec"""
     total_sec = milliseconds / 1000
     min = floor(total_sec / 60)
     sec = floor(total_sec % 60)
@@ -96,6 +105,7 @@ def do_logout():
 
 ################################# Base Routes ##################################
 
+
 @app.get('/')
 def homepage():
     """Show homepage"""
@@ -103,18 +113,18 @@ def homepage():
     if not g.user:
         return redirect(url_for("handle_login_page"))
 
-    home_rating_usernames = [user.username for user in g.user.following] + [g.user.username]
+    home_rating_usernames = [
+        user.username for user in g.user.following] + [g.user.username]
 
     ratings = (Rating
-                .query
-                .filter(
-                    Rating.author.in_(home_rating_usernames)
-                ).order_by(Rating.timestamp.desc())
-                .limit(100)
-                .all())
+               .query
+               .filter(
+                   Rating.author.in_(home_rating_usernames)
+               ).order_by(Rating.timestamp.desc())
+               .limit(100)
+               .all())
 
     return render_template('homepage.html', ratings=ratings)
-
 
 
 @app.route('/login', methods=["GET", "POST"])
@@ -138,6 +148,7 @@ def handle_login_page():
             return redirect(url_for('handle_login_page'))
 
     return render_template('login.html', form=form)
+
 
 @app.route('/signup', methods=["GET", "POST"])
 def handle_signup_form():
@@ -167,14 +178,13 @@ def handle_signup_form():
     return render_template('signup.html', form=form)
 
 
-
 ################################ Search Routes #################################
 
 
 @app.get('/search')
 @login_required
 def search_items():
-    """Search for albums or artists on spotify"""
+    """Loads search page template"""
 
     form = SearchForm(obj={
         'searchType': 'album',
@@ -188,18 +198,20 @@ def search_items():
 @login_required
 @token_required
 def get_search_results():
-    # """Takes a url in JSON and makes a returns a JSON object of the Spotify api
-    # results of that json"""
+    """Takes search term, type, and offset in the query string and returns JSON
+    of the results from the spotify API"""
 
     query = request.args.get("query", "a")
     search_type = request.args.get("type", "album")
     offset = request.args.get('offset')
 
     if search_type == "album":
-        results = album_search(query=query, offset=offset, token=g.spotify_token['token'])
+        results = album_search(query=query, offset=offset,
+                               token=g.spotify_token['token'])
 
     elif search_type == "artist":
-        results = artist_search(query=query, offset=offset, token=g.spotify_token['token'])
+        results = artist_search(
+            query=query, offset=offset, token=g.spotify_token['token'])
 
     elif search_type == "user":
         unserialized_results = User.search(search=query, offset=offset)
@@ -208,16 +220,17 @@ def get_search_results():
     return jsonify(results)
 
 
-
 ################################# User Routes ##################################
 
 @app.get('/users/<username>')
 @login_required
 def show_user_page(username):
+    """Show specific user page"""
 
     user = User.query.get_or_404(username)
 
     return render_template('userPage.html', user=user)
+
 
 @app.route('/edit-user', methods=["GET", "POST"])
 def handle_edit_user_form():
@@ -228,10 +241,10 @@ def handle_edit_user_form():
 
     if form.validate_on_submit():
         try:
-            g.user.first_name=form.first_name.data
-            g.user.last_name=form.last_name.data or None
-            g.user.bio=form.bio.data or None
-            g.user.image_url=form.image_url.data or DEFAULT_USER_IMAGE
+            g.user.first_name = form.first_name.data
+            g.user.last_name = form.last_name.data or None
+            g.user.bio = form.bio.data or None
+            g.user.image_url = form.image_url.data or DEFAULT_USER_IMAGE
 
             db.session.commit()
 
@@ -247,6 +260,7 @@ def handle_edit_user_form():
 @app.post('/follow-user/<username>')
 @login_required
 def handle_user_follow(username):
+    """Follows user if not already following, unfollows if they are"""
 
     user = User.query.get_or_404(username)
 
@@ -260,9 +274,11 @@ def handle_user_follow(username):
 
     return redirect(url_for('show_user_page', username=username))
 
+
 @app.post('/logout')
 @login_required
 def logout_user():
+    """Logs user out"""
 
     if not g.csrf_form.validate_on_submit():
         flash("Access unauthorized.", "danger")
@@ -271,9 +287,11 @@ def logout_user():
     do_logout()
     return redirect(url_for('handle_login_page'))
 
+
 @app.post('/delete-user')
 @login_required
 def delete_user():
+    """Deletes current signed in user"""
 
     if not g.csrf_form.validate_on_submit():
         flash("Access unauthorized.", "danger")
@@ -285,7 +303,6 @@ def delete_user():
     return redirect(url_for('handle_signup_form'))
 
 
-
 ################################# Music Routes #################################
 
 
@@ -293,6 +310,7 @@ def delete_user():
 @login_required
 @token_required
 def show_artist_page(artist_id):
+    """Shows specific artist page"""
 
     artist = get_artist_info(artist_id, token=g.spotify_token['token'])
 
@@ -330,7 +348,6 @@ def request_artists_albums(artist_id):
     return jsonify(albums)
 
 
-
 ################################ Rating Routes #################################
 
 
@@ -344,8 +361,6 @@ def show_rating(rating_id):
     return render_template('ratingPage.html', rating=rating)
 
 
-
-
 @app.route('/rate-album/<album_id>', methods=["GET", "POST"])
 @login_required
 @token_required
@@ -355,10 +370,11 @@ def handle_rating_form(album_id):
     form = AddRatingForm()
 
     album = get_album_info(album_id, g.spotify_token['token'])
-    rating = Rating.query.filter_by(album_id=album_id, author=g.user.username).one_or_none()
+    rating = Rating.query.filter_by(
+        album_id=album_id, author=g.user.username).one_or_none()
 
     song_choices = [(song['name'], song['name']) for song in album['tracks']]
-    song_choices.insert(0, ('',''))
+    song_choices.insert(0, ('', ''))
     form.favorite_song.choices = song_choices
 
     if rating:
@@ -367,12 +383,12 @@ def handle_rating_form(album_id):
 
     if form.validate_on_submit():
         rating = Rating(
-            rating = form.rating.data,
-            text = form.text.data,
-            favorite_song = form.favorite_song.data,
-            timestamp = datetime.now(),
-            album_id = album_id,
-            author = g.user.username
+            rating=form.rating.data,
+            text=form.text.data,
+            favorite_song=form.favorite_song.data,
+            timestamp=datetime.now(),
+            album_id=album_id,
+            author=g.user.username
         )
 
         db_album = Album.query.get(album_id)
@@ -403,12 +419,13 @@ def edit_rating(album_id):
     """Edit a user's preexisting album rating"""
 
     album = get_album_info(album_id, g.spotify_token['token'])
-    rating = Rating.query.filter_by(album_id=album_id, author=g.user.username).one_or_404()
+    rating = Rating.query.filter_by(
+        album_id=album_id, author=g.user.username).one_or_404()
 
     form = EditRatingForm(obj=rating)
 
     song_choices = [(song['name'], song['name']) for song in album['tracks']]
-    song_choices.insert(0, ('',''))
+    song_choices.insert(0, ('', ''))
     form.favorite_song.choices = song_choices
 
     if form.validate_on_submit():
@@ -439,9 +456,12 @@ def delete_rating(rating_id):
 
     return redirect(url_for('show_album', album_id=rating.album_id))
 
+
 @app.get('/ratings/load')
 @login_required
 def load_ratings():
+    """Takes information about the ratings to show in the query string and
+    returns JSON of the html for those ratings"""
 
     user = request.args.get('user', '')
     album_id = request.args.get('albumId', '')
@@ -449,19 +469,20 @@ def load_ratings():
     offset = request.args.get('offset', 0)
 
     if homepage:
-        usernames = [user.username for user in g.user.following] + [g.user.username]
+        usernames = [user.username for user in g.user.following] + \
+            [g.user.username]
     else:
         usernames = [user]
 
     ratings = (Rating
-                .query
-                .filter(or_(
-                    Rating.author.in_(usernames),
-                    Rating.album_id == album_id
-                )).order_by(Rating.timestamp.desc())
-                .limit(10)
-                .offset(offset)
-                .all())
+               .query
+               .filter(or_(
+                   Rating.author.in_(usernames),
+                   Rating.album_id == album_id
+               )).order_by(Rating.timestamp.desc())
+               .limit(10)
+               .offset(offset)
+               .all())
 
     get_rating_html = get_template_attribute('rating.html', 'show_rating')
     rating_htmls = [get_rating_html(rating) for rating in ratings]

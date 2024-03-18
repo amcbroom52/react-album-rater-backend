@@ -1,11 +1,20 @@
 {% macro show_rating(rating) %}
 
-<div class="card border-primary mb-3 text-light col-9" style="background-color: rgba(38, 39, 48, 0.141); margin: auto;">
-  <div class="card-body" onclick="location.href='/ratings/{{rating.id}}';" style="cursor: pointer;">
+<div
+  class="card border-primary mb-3 text-light col-9"
+  style="background-color: rgba(38, 39, 48, 0.141); margin: auto;">
+  <div
+    class="card-body"
+    onclick="location.href='/ratings/{{rating.id}}';"
+    style="cursor: pointer;">
     <p style="position: absolute; top: 10px; right: 10px;" class="text-body">
       {{rating.timestamp.strftime('%b %d %Y, %H:%M')}}
     </p>
-    <img src="{{rating.album.image_url}}" alt="{{rating.album.name}}" class="col-2" style="display: inline-block">
+    <img
+      src="{{rating.album.image_url}}"
+      alt="{{rating.album.name}}"
+      class="col-2"
+      style="display: inline-block">
     <div style="display: inline-block;">
       <h4>
         <a href="/albums/{{rating.album.id}}" class="card-title">
@@ -35,7 +44,9 @@
       {% endfor %}
 
       {% if rating.favorite_song %}
-        <span class="ms-2 text-secondary">Favorite Song: {{rating.favorite_song}}</span>
+        <span class="ms-2 text-secondary">
+          Favorite Song: {{rating.favorite_song}}
+        </span>
       {% endif %}
 
       </div>

@@ -6,19 +6,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %} {% endblock %}</title>
   <script src="https://unpkg.com/jquery"></script>
-  <link
-      href="https://bootswatch.com/5/pulse/bootstrap.css"
-      rel="stylesheet">
-  <link
-      rel="stylesheet"
-      href="https://www.unpkg.com/bootstrap-icons/font/bootstrap-icons.css">
+  <link href="https://bootswatch.com/5/pulse/bootstrap.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://www.unpkg.com/bootstrap-icons/font/bootstrap-icons.css">
 </head>
 
 {% for category, message in get_flashed_messages(with_categories=True) %}
 <div class="alert alert-{{ category }} mb-0">{{ message }}</div>
 {% endfor %}
 
-<nav class="navbar navbar-expand bg-primary" data-bs-theme="dark" style="height: 50px;">
+<nav
+  class="navbar navbar-expand bg-primary"
+  data-bs-theme="dark"
+  style="height: 50px;">
   <div class="container-fluid">
     <ul class="navbar-nav me-auto">
       <li class="nav-item">
@@ -41,7 +40,9 @@
       <li>
         <form action="/logout" method="POST">
           {{ g.csrf_form.hidden_tag() }}
-          <button class="btn btn-dark" type="submit" style="border-radius: 10px;">Log Out</button>
+          <button class="btn btn-dark" type="submit" style="border-radius: 10px;">
+            Log Out
+          </button>
         </form>
       </li>
     </ul>

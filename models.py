@@ -10,14 +10,12 @@ DEFAULT_USER_IMAGE = (
     "https://braverplayers.org/wp-content/uploads/2022/09/blank-pfp.png")
 
 
-
 def connect_db(app):
     """Connect this database to provided Flask app. Called in app.py"""
 
     app.app_context().push()
     db.app = app
     db.init_app(app)
-
 
 
 class Follow(db.Model):
@@ -38,7 +36,6 @@ class Follow(db.Model):
         primary_key=True,
         nullable=False
     )
-
 
 
 class User(db.Model):
@@ -87,6 +84,8 @@ class User(db.Model):
     ratings = db.relationship('Rating', backref='user')
 
     def serialize(self):
+        """Returns a dictionary of the information about the user"""
+
         return {
             'username': self.username,
             'first_name': self.first_name,
@@ -96,24 +95,27 @@ class User(db.Model):
         }
 
     def is_following(self, user):
+        """Checks if current user is following given user"""
 
         found_user_list = [
             following for following in self.following if following == user]
         return len(found_user_list) == 1
 
     def is_followed_by(self, user):
+        """Checks if given user is following current user"""
 
         found_user_list = [
             follower for follower in self.followers if follower == user]
         return len(found_user_list) == 1
 
     def delete_user(self):
+        """Deletes current user and all their ratings and followings"""
 
         Rating.query.filter_by(author=self.username).delete()
         Follow.query.filter(
             or_(
-                Follow.user_following==self.username,
-                Follow.user_being_followed==self.username)).delete()
+                Follow.user_following == self.username,
+                Follow.user_being_followed == self.username)).delete()
 
         db.session.delete(self)
 
@@ -160,17 +162,15 @@ class User(db.Model):
         """Searches for users in the database that match the search string"""
 
         users = (cls
-                .query
-                .filter(or_(
+                 .query
+                 .filter(or_(
                      cls.username.ilike(f'%{search}%'),
                      cls.first_name.ilike(f"%{search}%"),
                      cls.last_name.ilike(f'%{search}%')
-                )).limit(20)
-                .offset(offset))
+                 )).limit(20)
+                 .offset(offset))
 
         return users
-
-
 
 
 class Rating(db.Model):
@@ -220,6 +220,7 @@ class Rating(db.Model):
     )
 
     def serialize(self):
+        """Returns a dictionary of the information about the rating"""
         return {
             'id': self.id,
             'rating': self.rating,
@@ -229,10 +230,6 @@ class Rating(db.Model):
             'album_id': self.album_id,
             'author': self.author
         }
-
-    # @classmethod
-    # def create_rating(cls, )
-
 
 
 class Album(db.Model):

@@ -6,6 +6,7 @@ let offsetAmount = 0;
 let loaded = true;
 let endOfItems = false;
 
+/** Makes API request to server to recieve rating HTML and appends it to the page*/
 async function getRatings() {
 
   const params = new URLSearchParams({
@@ -27,6 +28,7 @@ async function getRatings() {
 
 }
 
+/**Calls `getRatings` when user gets to the end of the page */
 async function handleScroll() {
   let height = $(document).height();
   let position = $(window).height() + $(window).scrollTop();

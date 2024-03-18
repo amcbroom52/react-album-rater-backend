@@ -6,18 +6,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %} {% endblock %}</title>
   <script src="https://unpkg.com/jquery"></script>
-  <link
-      href="https://bootswatch.com/5/pulse/bootstrap.css"
-      rel="stylesheet">
-  <link
-      rel="stylesheet"
-      href="https://www.unpkg.com/bootstrap-icons/font/bootstrap-icons.css">
+  <link href="https://bootswatch.com/5/pulse/bootstrap.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://www.unpkg.com/bootstrap-icons/font/bootstrap-icons.css">
 </head>
 
 <body class="bg-dark text-light">
 
   {% for category, message in get_flashed_messages(with_categories=True) %}
-    <div class="alert alert-{{ category }}">{{ message }}</div>
+  <div class="alert alert-{{ category }}">{{ message }}</div>
   {% endfor %}
   {% block content %}
   {% endblock %}

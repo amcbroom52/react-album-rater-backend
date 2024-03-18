@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, TextAreaField, SelectField, RadioField
 from wtforms.validators import InputRequired, Length, Optional, URL, AnyOf
 
+
 class LoginForm(FlaskForm):
     """Form for loggin in user"""
 
@@ -14,7 +15,6 @@ class LoginForm(FlaskForm):
         "Password",
         validators=[InputRequired()]
     )
-
 
 
 class SignupForm(FlaskForm):
@@ -69,8 +69,10 @@ class AddRatingForm(FlaskForm):
 
     rating = RadioField(
         "Stars",
-        choices=[(0.5, 0.5), (1, 1), (1.5, 1.5), (2, 2), (2.5, 2.5), (3, 3), (3.5, 3.5), (4, 4), (4.5, 4.5), (5, 5)],
-        validators=[InputRequired(), AnyOf(['0.5', '1', '1.5', '2', '2.5', '3', '3.5', '4', '4.5', '5'])]
+        choices=[(0.5, 0.5), (1, 1), (1.5, 1.5), (2, 2), (2.5, 2.5),
+                 (3, 3), (3.5, 3.5), (4, 4), (4.5, 4.5), (5, 5)],
+        validators=[InputRequired(), AnyOf(
+            ['0.5', '1', '1.5', '2', '2.5', '3', '3.5', '4', '4.5', '5'])]
     )
 
     favorite_song = SelectField(
@@ -80,14 +82,15 @@ class AddRatingForm(FlaskForm):
     text = TextAreaField("Thoughts (Optional)")
 
 
-
 class EditRatingForm(FlaskForm):
     """Form for creating a rating for an album"""
 
     rating = RadioField(
         "Stars",
-        choices=[(0.5, 0.5), (1, 1), (1.5, 1.5), (2, 2), (2.5, 2.5), (3, 3), (3.5, 3.5), (4, 4), (4.5, 4.5), (5, 5)],
-        validators=[InputRequired(), AnyOf(['0.5', '1', '1.5', '2', '2.5', '3', '3.5', '4', '4.5', '5'])]
+        choices=[(0.5, 0.5), (1, 1), (1.5, 1.5), (2, 2), (2.5, 2.5),
+                 (3, 3), (3.5, 3.5), (4, 4), (4.5, 4.5), (5, 5)],
+        validators=[InputRequired(), AnyOf(
+            ['0.5', '1', '1.5', '2', '2.5', '3', '3.5', '4', '4.5', '5'])]
     )
 
     favorite_song = SelectField(
@@ -97,6 +100,7 @@ class EditRatingForm(FlaskForm):
 
     text = TextAreaField("Thoughts")
 
+
 class SearchForm(FlaskForm):
     """Form for searching items"""
 
@@ -105,11 +109,11 @@ class SearchForm(FlaskForm):
     )
 
     searchType = RadioField(
-        choices=[('album', 'Albums'), ('artist', 'Artists'), ('user', 'Users')],
+        choices=[('album', 'Albums'), ('artist',
+                                       'Artists'), ('user', 'Users')],
         default='album',
         validators=[InputRequired(), AnyOf(['album', 'artist', 'user'])]
     )
-
 
 
 class CSRFProtectForm(FlaskForm):
