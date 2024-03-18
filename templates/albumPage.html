@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% from 'rating.html' import show_rating with context%}
 
+{% block title %} {{album.name}} {% endblock %}
+
 {% block content %}
 
 <div hidden id="album-id">{{album.id}}</div>

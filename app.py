@@ -233,6 +233,7 @@ def show_user_page(username):
 
 
 @app.route('/edit-user', methods=["GET", "POST"])
+@login_required
 def handle_edit_user_form():
     """Edit user"""
 
