@@ -221,13 +221,14 @@ class Rating(db.Model):
 
     def serialize(self):
         """Returns a dictionary of the information about the rating"""
+
         return {
             'id': self.id,
             'rating': self.rating,
-            'favorite_song': self.favorite_song,
+            'favoriteSong': self.favorite_song,
             'text': self.text,
             'timestamp': self.timestamp,
-            'album_id': self.album_id,
+            'album': self.album.serialize(),
             'author': self.author
         }
 
@@ -262,5 +263,16 @@ class Album(db.Model):
         db.String(30),
         nullable=False
     )
+
+    def serialize(self):
+        """Returns a dictionary of the information about the album"""
+
+        return {
+            'id': self.id,
+            'name': self.name,
+            'imageUrl': self.image_url,
+            'artistName': self.artist_name,
+            'artistId': self.artist_id
+        }
 
     ratings = db.relationship("Rating", backref="album")

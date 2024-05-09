@@ -1,6 +1,7 @@
 import os
 
 from flask import Flask, render_template, session, redirect, flash, g, url_for, request, jsonify, get_template_attribute
+from flask_cors import CORS
 from models import connect_db, db,  User, Rating, Album, DEFAULT_USER_IMAGE
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import or_
@@ -12,6 +13,7 @@ from datetime import datetime
 from math import floor
 
 app = Flask(__name__)
+CORS(app)
 
 load_dotenv()
 
@@ -489,3 +491,11 @@ def load_ratings():
     rating_htmls = [get_rating_html(rating) for rating in ratings]
 
     return jsonify(rating_htmls)
+
+@app.get('/ratings')
+def get_ratings_data():
+    """Returns JSON data of ratings from database"""
+
+    ratings = Rating.query.all()
+
+    return jsonify({"ratings": [rating.serialize() for rating in ratings]})

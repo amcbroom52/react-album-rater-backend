@@ -9,6 +9,7 @@ exceptiongroup==1.2.0
 executing==2.0.1
 Flask==2.3.3
 Flask-Bcrypt==1.0.1
+Flask-Cors==4.0.1
 Flask-DebugToolbar @ git+https://github.com/pallets-eco/flask-debugtoolbar@9b63ad1837458f14597b87ad266da3d38835071f
 Flask-SQLAlchemy==3.1.1
 Flask-WTF==1.2.1
