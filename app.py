@@ -2,6 +2,7 @@ import os
 
 from flask import Flask, render_template, session, redirect, flash, g, url_for, request, jsonify, get_template_attribute
 from flask_cors import CORS
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 from models import connect_db, db,  User, Rating, Album, DEFAULT_USER_IMAGE
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import or_
@@ -18,6 +19,7 @@ CORS(app)
 load_dotenv()
 
 app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
+app.config['JWT_SECRET_KEY'] = os.environ['SECRET_KEY']
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
     "DATABASE_URL", 'postgresql:///album_rater')
@@ -26,6 +28,7 @@ app.config['SQLALCHEMY_ECHO'] = True
 
 
 connect_db(app)
+jwt = JWTManager(app)
 
 CURR_USER_KEY = "active_user"
 
@@ -129,27 +132,27 @@ def homepage():
     return render_template('homepage.html', ratings=ratings)
 
 
-@app.route('/login', methods=["GET", "POST"])
-def handle_login_page():
-    """Login user"""
+# @app.route('/login', methods=["GET", "POST"])
+# def handle_login_page():
+#     """Login user"""
 
-    form = LoginForm()
+#     form = LoginForm()
 
-    if form.validate_on_submit():
-        user = User.login(
-            username=form.username.data,
-            password=form.password.data)
+#     if form.validate_on_submit():
+#         user = User.login(
+#             username=form.username.data,
+#             password=form.password.data)
 
-        if user:
-            do_login(user)
+#         if user:
+#             do_login(user)
 
-            return redirect(url_for('homepage'))
+#             return redirect(url_for('homepage'))
 
-        else:
-            flash("Invalid Credentials", "danger")
-            return redirect(url_for('handle_login_page'))
+#         else:
+#             flash("Invalid Credentials", "danger")
+#             return redirect(url_for('handle_login_page'))
 
-    return render_template('login.html', form=form)
+#     return render_template('login.html', form=form)
 
 
 @app.route('/signup', methods=["GET", "POST"])
@@ -223,6 +226,23 @@ def get_search_results():
 
 
 ################################# User Routes ##################################
+
+@app.post('/login')
+def login_user():
+    """Checks user credentials and returns token if valid"""
+
+    username = request.json.get('username')
+
+    user = User.login(
+            username=username,
+            password=request.json.get('password'))
+
+    if not user:
+        return jsonify({'errors': ['Invalid credentials']}), 401
+
+    token = create_access_token(identity=username)
+    return jsonify({"token": token})
+
 
 @app.get('/users/<username>')
 @login_required
@@ -353,15 +373,6 @@ def request_artists_albums(artist_id):
 
 ################################ Rating Routes #################################
 
-
-@app.get('/ratings/<int:rating_id>')
-@login_required
-def show_rating(rating_id):
-    """Show Rating"""
-
-    rating = Rating.query.get_or_404(rating_id)
-
-    return render_template('ratingPage.html', rating=rating)
 
 
 @app.route('/rate-album/<album_id>', methods=["GET", "POST"])
@@ -499,3 +510,11 @@ def get_ratings_data():
     ratings = Rating.query.all()
 
     return jsonify({"ratings": [rating.serialize() for rating in ratings]})
+
+@app.get('/ratings/<int:rating_id>')
+def get_rating_data(rating_id):
+    """Returns JSON data of a single rating from database"""
+
+    rating = Rating.query.get_or_404(rating_id)
+
+    return jsonify({"rating": rating.serialize()})
