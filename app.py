@@ -10,7 +10,7 @@ from forms import LoginForm, SignupForm, CSRFProtectForm, EditRatingForm, AddRat
 from spotify import get_access_token, get_album_info, album_search, artist_search, get_artist_info, get_artists_albums
 from functools import wraps
 from dotenv import load_dotenv
-from datetime import datetime
+from datetime import datetime, timedelta
 from math import floor
 
 app = Flask(__name__)
@@ -155,32 +155,32 @@ def homepage():
 #     return render_template('login.html', form=form)
 
 
-@app.route('/signup', methods=["GET", "POST"])
-def handle_signup_form():
-    """Create new user and log them in"""
+# @app.route('/signup', methods=["GET", "POST"])
+# def handle_signup_form():
+#     """Create new user and log them in"""
 
-    form = SignupForm()
+#     form = SignupForm()
 
-    if form.validate_on_submit():
-        try:
-            user = User.signup(
-                username=form.username.data,
-                first_name=form.first_name.data,
-                last_name=form.last_name.data or None,
-                password=form.password.data
-            )
+#     if form.validate_on_submit():
+#         try:
+#             user = User.signup(
+#                 username=form.username.data,
+#                 first_name=form.first_name.data,
+#                 last_name=form.last_name.data or None,
+#                 password=form.password.data
+#             )
 
-            db.session.commit()
-            do_login(user)
+#             db.session.commit()
+#             do_login(user)
 
-            flash("User created successfully", "success")
-            return redirect(url_for('show_user_page', username=user.username))
+#             flash("User created successfully", "success")
+#             return redirect(url_for('show_user_page', username=user.username))
 
-        except IntegrityError:
-            flash("Username Taken.", "danger")
-            return redirect(url_for('handle_signup_form', form=form))
+#         except IntegrityError:
+#             flash("Username Taken.", "danger")
+#             return redirect(url_for('handle_signup_form', form=form))
 
-    return render_template('signup.html', form=form)
+#     return render_template('signup.html', form=form)
 
 
 ################################ Search Routes #################################
@@ -227,6 +227,35 @@ def get_search_results():
 
 ################################# User Routes ##################################
 
+@app.post('/signup')
+def handle_signup_form():
+    """Create new user and log them in"""
+
+    username = request.json.get("username")
+
+    try:
+        user = User.signup(
+            username=username,
+            first_name=request.json.get("firstName"),
+            last_name=request.json.get("lastName"),
+            password=request.json.get("password"),
+        )
+
+    except IntegrityError as e:
+
+        return jsonify({"errors": e})
+
+    else:
+        db.session.commit()
+
+        token = create_access_token(
+            identity={"username": username},
+            expires_delta=False
+        )
+
+        return jsonify({"token": token})
+
+
 @app.post('/login')
 def login_user():
     """Checks user credentials and returns token if valid"""
@@ -234,14 +263,18 @@ def login_user():
     username = request.json.get('username')
 
     user = User.login(
-            username=username,
-            password=request.json.get('password'))
+        username=username,
+        password=request.json.get('password'))
 
     if not user:
         return jsonify({'errors': ['Invalid credentials']}), 401
 
-    token = create_access_token(identity=username)
-    return jsonify({"token": token})
+    token = create_access_token(
+        identity={"username": username},
+        expires_delta=False
+    )
+
+    return jsonify({"token": token, "user": user.serialize()})
 
 
 @app.get('/users/<username>')
@@ -374,7 +407,6 @@ def request_artists_albums(artist_id):
 ################################ Rating Routes #################################
 
 
-
 @app.route('/rate-album/<album_id>', methods=["GET", "POST"])
 @login_required
 @token_required
@@ -503,7 +535,9 @@ def load_ratings():
 
     return jsonify(rating_htmls)
 
+
 @app.get('/ratings')
+# @jwt_required()
 def get_ratings_data():
     """Returns JSON data of ratings from database"""
 
@@ -511,7 +545,9 @@ def get_ratings_data():
 
     return jsonify({"ratings": [rating.serialize() for rating in ratings]})
 
+
 @app.get('/ratings/<int:rating_id>')
+# @jwt_required()
 def get_rating_data(rating_id):
     """Returns JSON data of a single rating from database"""
 
