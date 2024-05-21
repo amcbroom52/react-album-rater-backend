@@ -111,25 +111,25 @@ def do_logout():
 ################################# Base Routes ##################################
 
 
-@app.get('/')
-def homepage():
-    """Show homepage"""
+# @app.get('/')
+# def homepage():
+#     """Show homepage"""
 
-    if not g.user:
-        return redirect(url_for("handle_login_page"))
+#     if not g.user:
+#         return redirect(url_for("handle_login_page"))
 
-    home_rating_usernames = [
-        user.username for user in g.user.following] + [g.user.username]
+#     home_rating_usernames = [
+#         user.username for user in g.user.following] + [g.user.username]
 
-    ratings = (Rating
-               .query
-               .filter(
-                   Rating.author.in_(home_rating_usernames)
-               ).order_by(Rating.timestamp.desc())
-               .limit(100)
-               .all())
+#     ratings = (Rating
+#                .query
+#                .filter(
+#                    Rating.author.in_(home_rating_usernames)
+#                ).order_by(Rating.timestamp.desc())
+#                .limit(100)
+#                .all())
 
-    return render_template('homepage.html', ratings=ratings)
+#     return render_template('homepage.html', ratings=ratings)
 
 
 # @app.route('/login', methods=["GET", "POST"])
@@ -186,43 +186,43 @@ def homepage():
 ################################ Search Routes #################################
 
 
-@app.get('/search')
-@login_required
-def search_items():
-    """Loads search page template"""
+# @app.get('/search')
+# @login_required
+# def search_items():
+#     """Loads search page template"""
 
-    form = SearchForm(obj={
-        'searchType': 'album',
-        'search': None
-    })
+#     form = SearchForm(obj={
+#         'searchType': 'album',
+#         'search': None
+#     })
 
-    return render_template('search.html', form=form)
+#     return render_template('search.html', form=form)
 
 
-@app.get('/search/results')
-@login_required
-@token_required
-def get_search_results():
-    """Takes search term, type, and offset in the query string and returns JSON
-    of the results from the spotify API"""
+# @app.get('/search/results')
+# @login_required
+# @token_required
+# def get_search_results():
+#     """Takes search term, type, and offset in the query string and returns JSON
+#     of the results from the spotify API"""
 
-    query = request.args.get("query", "a")
-    search_type = request.args.get("type", "album")
-    offset = request.args.get('offset')
+#     query = request.args.get("query", "a")
+#     search_type = request.args.get("type", "album")
+#     offset = request.args.get('offset')
 
-    if search_type == "album":
-        results = album_search(query=query, offset=offset,
-                               token=g.spotify_token['token'])
+#     if search_type == "album":
+#         results = album_search(query=query, offset=offset,
+#                                token=g.spotify_token['token'])
 
-    elif search_type == "artist":
-        results = artist_search(
-            query=query, offset=offset, token=g.spotify_token['token'])
+#     elif search_type == "artist":
+#         results = artist_search(
+#             query=query, offset=offset, token=g.spotify_token['token'])
 
-    elif search_type == "user":
-        unserialized_results = User.search(search=query, offset=offset)
-        results = [user.serialize() for user in unserialized_results]
+#     elif search_type == "user":
+#         unserialized_results = User.search(search=query, offset=offset)
+#         results = [user.serialize() for user in unserialized_results]
 
-    return jsonify(results)
+#     return jsonify(results)
 
 
 ################################# User Routes ##################################
@@ -261,10 +261,12 @@ def login_user():
     """Checks user credentials and returns token if valid"""
 
     username = request.json.get('username')
+    print("**************!!!!!!!!!!!!!!!!!!**************", request.json)
 
     user = User.login(
         username=username,
         password=request.json.get('password'))
+
 
     if not user:
         return jsonify({'errors': ['Invalid credentials']}), 401
@@ -274,270 +276,279 @@ def login_user():
         expires_delta=False
     )
 
-    return jsonify({"token": token, "user": user.serialize()})
+    return jsonify({"token": token})
 
+
+# @app.get('/users/<username>')
+# @login_required
+# def show_user_page(username):
+#     """Show specific user page"""
+
+#     user = User.query.get_or_404(username)
+
+#     return render_template('userPage.html', user=user)
 
 @app.get('/users/<username>')
-@login_required
-def show_user_page(username):
-    """Show specific user page"""
+@jwt_required()
+def get_user_data(username):
+    """Return JSON data of a specific user"""
 
     user = User.query.get_or_404(username)
 
-    return render_template('userPage.html', user=user)
+    return jsonify({"user": user.serialize()})
 
 
-@app.route('/edit-user', methods=["GET", "POST"])
-@login_required
-def handle_edit_user_form():
-    """Edit user"""
+# @app.route('/edit-user', methods=["GET", "POST"])
+# @login_required
+# def handle_edit_user_form():
+#     """Edit user"""
 
-    form = EditUserForm(obj=g.user)
-    db.session.rollback()
+#     form = EditUserForm(obj=g.user)
+#     db.session.rollback()
 
-    if form.validate_on_submit():
-        try:
-            g.user.first_name = form.first_name.data
-            g.user.last_name = form.last_name.data or None
-            g.user.bio = form.bio.data or None
-            g.user.image_url = form.image_url.data or DEFAULT_USER_IMAGE
+#     if form.validate_on_submit():
+#         try:
+#             g.user.first_name = form.first_name.data
+#             g.user.last_name = form.last_name.data or None
+#             g.user.bio = form.bio.data or None
+#             g.user.image_url = form.image_url.data or DEFAULT_USER_IMAGE
 
-            db.session.commit()
+#             db.session.commit()
 
-            return redirect(url_for('show_user_page', username=g.user.username))
+#             return redirect(url_for('show_user_page', username=g.user.username))
 
-        except ValueError:
-            flash("Username Taken.", "danger")
-            return redirect(url_for('handle_edit_user_form', form=form))
+#         except ValueError:
+#             flash("Username Taken.", "danger")
+#             return redirect(url_for('handle_edit_user_form', form=form))
 
-    return render_template('editUserForm.html', form=form)
-
-
-@app.post('/follow-user/<username>')
-@login_required
-def handle_user_follow(username):
-    """Follows user if not already following, unfollows if they are"""
-
-    user = User.query.get_or_404(username)
-
-    if g.user.is_following(user):
-        g.user.following.remove(user)
-
-    else:
-        g.user.following.append(user)
-
-    db.session.commit()
-
-    return redirect(url_for('show_user_page', username=username))
+#     return render_template('editUserForm.html', form=form)
 
 
-@app.post('/logout')
-@login_required
-def logout_user():
-    """Logs user out"""
+# @app.post('/follow-user/<username>')
+# @login_required
+# def handle_user_follow(username):
+#     """Follows user if not already following, unfollows if they are"""
 
-    if not g.csrf_form.validate_on_submit():
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
+#     user = User.query.get_or_404(username)
 
-    do_logout()
-    return redirect(url_for('handle_login_page'))
+#     if g.user.is_following(user):
+#         g.user.following.remove(user)
+
+#     else:
+#         g.user.following.append(user)
+
+#     db.session.commit()
+
+#     return redirect(url_for('show_user_page', username=username))
 
 
-@app.post('/delete-user')
-@login_required
-def delete_user():
-    """Deletes current signed in user"""
+# @app.post('/logout')
+# @login_required
+# def logout_user():
+#     """Logs user out"""
 
-    if not g.csrf_form.validate_on_submit():
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
+#     if not g.csrf_form.validate_on_submit():
+#         flash("Access unauthorized.", "danger")
+#         return redirect("/")
 
-    do_logout()
-    g.user.delete_user()
-    db.session.commit()
-    return redirect(url_for('handle_signup_form'))
+#     do_logout()
+#     return redirect(url_for('handle_login_page'))
+
+
+# @app.post('/delete-user')
+# @login_required
+# def delete_user():
+#     """Deletes current signed in user"""
+
+#     if not g.csrf_form.validate_on_submit():
+#         flash("Access unauthorized.", "danger")
+#         return redirect("/")
+
+#     do_logout()
+#     g.user.delete_user()
+#     db.session.commit()
+#     return redirect(url_for('handle_signup_form'))
 
 
 ################################# Music Routes #################################
 
 
-@app.get('/artists/<artist_id>')
-@login_required
-@token_required
-def show_artist_page(artist_id):
-    """Shows specific artist page"""
+# @app.get('/artists/<artist_id>')
+# @login_required
+# @token_required
+# def show_artist_page(artist_id):
+#     """Shows specific artist page"""
 
-    artist = get_artist_info(artist_id, token=g.spotify_token['token'])
+#     artist = get_artist_info(artist_id, token=g.spotify_token['token'])
 
-    return render_template('artistPage.html', artist=artist)
-
-
-@app.get('/albums/<album_id>')
-@login_required
-@token_required
-def show_album(album_id):
-    """Show individual album page"""
-
-    album = get_album_info(album_id, g.spotify_token['token'])
-
-    ratings = Rating.query.filter_by(album_id=album_id).all()
-
-    return render_template("albumPage.html", album=album, ratings=ratings)
+#     return render_template('artistPage.html', artist=artist)
 
 
-@app.get('/artists/<artist_id>/albums')
-@login_required
-@token_required
-def request_artists_albums(artist_id):
-    """Takes an artist id as a parameter and an offset amount as a query string
-    and returns JSON of that artists albums"""
+# @app.get('/albums/<album_id>')
+# @login_required
+# @token_required
+# def show_album(album_id):
+#     """Show individual album page"""
 
-    offset = request.args.get('offset', 0)
+#     album = get_album_info(album_id, g.spotify_token['token'])
 
-    albums = get_artists_albums(
-        artist_id=artist_id,
-        offset=offset,
-        token=g.spotify_token['token']
-    )
+#     ratings = Rating.query.filter_by(album_id=album_id).all()
 
-    return jsonify(albums)
+#     return render_template("albumPage.html", album=album, ratings=ratings)
+
+
+# @app.get('/artists/<artist_id>/albums')
+# @login_required
+# @token_required
+# def request_artists_albums(artist_id):
+#     """Takes an artist id as a parameter and an offset amount as a query string
+#     and returns JSON of that artists albums"""
+
+#     offset = request.args.get('offset', 0)
+
+#     albums = get_artists_albums(
+#         artist_id=artist_id,
+#         offset=offset,
+#         token=g.spotify_token['token']
+#     )
+
+#     return jsonify(albums)
 
 
 ################################ Rating Routes #################################
 
 
-@app.route('/rate-album/<album_id>', methods=["GET", "POST"])
-@login_required
-@token_required
-def handle_rating_form(album_id):
-    """Create new album rating"""
+# @app.route('/rate-album/<album_id>', methods=["GET", "POST"])
+# @login_required
+# @token_required
+# def handle_rating_form(album_id):
+#     """Create new album rating"""
 
-    form = AddRatingForm()
+#     form = AddRatingForm()
 
-    album = get_album_info(album_id, g.spotify_token['token'])
-    rating = Rating.query.filter_by(
-        album_id=album_id, author=g.user.username).one_or_none()
+#     album = get_album_info(album_id, g.spotify_token['token'])
+#     rating = Rating.query.filter_by(
+#         album_id=album_id, author=g.user.username).one_or_none()
 
-    song_choices = [(song['name'], song['name']) for song in album['tracks']]
-    song_choices.insert(0, ('', ''))
-    form.favorite_song.choices = song_choices
+#     song_choices = [(song['name'], song['name']) for song in album['tracks']]
+#     song_choices.insert(0, ('', ''))
+#     form.favorite_song.choices = song_choices
 
-    if rating:
-        flash("Redirected to edit previous rating", "warning")
-        return redirect(url_for('edit_rating', album_id=album_id))
+#     if rating:
+#         flash("Redirected to edit previous rating", "warning")
+#         return redirect(url_for('edit_rating', album_id=album_id))
 
-    if form.validate_on_submit():
-        rating = Rating(
-            rating=form.rating.data,
-            text=form.text.data,
-            favorite_song=form.favorite_song.data,
-            timestamp=datetime.now(),
-            album_id=album_id,
-            author=g.user.username
-        )
+#     if form.validate_on_submit():
+#         rating = Rating(
+#             rating=form.rating.data,
+#             text=form.text.data,
+#             favorite_song=form.favorite_song.data,
+#             timestamp=datetime.now(),
+#             album_id=album_id,
+#             author=g.user.username
+#         )
 
-        db_album = Album.query.get(album_id)
+#         db_album = Album.query.get(album_id)
 
-        if not db_album:
-            db_album = Album(
-                id=album['id'],
-                name=album['name'],
-                image_url=album['image_url'],
-                artist_name=album['artists'][0]['name'],
-                artist_id=album['artists'][0]['id']
-            )
+#         if not db_album:
+#             db_album = Album(
+#                 id=album['id'],
+#                 name=album['name'],
+#                 image_url=album['image_url'],
+#                 artist_name=album['artists'][0]['name'],
+#                 artist_id=album['artists'][0]['id']
+#             )
 
-            db.session.add(db_album)
+#             db.session.add(db_album)
 
-        db.session.add(rating)
-        db.session.commit()
+#         db.session.add(rating)
+#         db.session.commit()
 
-        return redirect(url_for('show_album', album_id=album_id))
+#         return redirect(url_for('show_album', album_id=album_id))
 
-    return render_template('addRatingForm.html', form=form, album=album)
-
-
-@app.route('/edit-rating/<album_id>', methods=["GET", "POST"])
-@login_required
-@token_required
-def edit_rating(album_id):
-    """Edit a user's preexisting album rating"""
-
-    album = get_album_info(album_id, g.spotify_token['token'])
-    rating = Rating.query.filter_by(
-        album_id=album_id, author=g.user.username).one_or_404()
-
-    form = EditRatingForm(obj=rating)
-
-    song_choices = [(song['name'], song['name']) for song in album['tracks']]
-    song_choices.insert(0, ('', ''))
-    form.favorite_song.choices = song_choices
-
-    if form.validate_on_submit():
-        rating.rating = form.rating.data
-        rating.text = form.text.data
-        rating.favorite_song = form.favorite_song.data
-
-        db.session.commit()
-
-        return redirect(url_for('show_album', album_id=album_id))
-
-    return render_template('editRatingForm.html', form=form, album=album)
+#     return render_template('addRatingForm.html', form=form, album=album)
 
 
-@app.post('/delete-rating/<int:rating_id>')
-@login_required
-def delete_rating(rating_id):
-    """Delete a rating"""
+# @app.route('/edit-rating/<album_id>', methods=["GET", "POST"])
+# @login_required
+# @token_required
+# def edit_rating(album_id):
+#     """Edit a user's preexisting album rating"""
 
-    rating = Rating.query.get_or_404(rating_id)
+#     album = get_album_info(album_id, g.spotify_token['token'])
+#     rating = Rating.query.filter_by(
+#         album_id=album_id, author=g.user.username).one_or_404()
 
-    if not g.csrf_form.validate_on_submit():
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
+#     form = EditRatingForm(obj=rating)
 
-    db.session.delete(rating)
-    db.session.commit()
+#     song_choices = [(song['name'], song['name']) for song in album['tracks']]
+#     song_choices.insert(0, ('', ''))
+#     form.favorite_song.choices = song_choices
 
-    return redirect(url_for('show_album', album_id=rating.album_id))
+#     if form.validate_on_submit():
+#         rating.rating = form.rating.data
+#         rating.text = form.text.data
+#         rating.favorite_song = form.favorite_song.data
+
+#         db.session.commit()
+
+#         return redirect(url_for('show_album', album_id=album_id))
+
+#     return render_template('editRatingForm.html', form=form, album=album)
 
 
-@app.get('/ratings/load')
-@login_required
-def load_ratings():
-    """Takes information about the ratings to show in the query string and
-    returns JSON of the html for those ratings"""
+# @app.post('/delete-rating/<int:rating_id>')
+# @login_required
+# def delete_rating(rating_id):
+#     """Delete a rating"""
 
-    user = request.args.get('user', '')
-    album_id = request.args.get('albumId', '')
-    homepage = request.args.get('homepage')
-    offset = request.args.get('offset', 0)
+#     rating = Rating.query.get_or_404(rating_id)
 
-    if homepage:
-        usernames = [user.username for user in g.user.following] + \
-            [g.user.username]
-    else:
-        usernames = [user]
+#     if not g.csrf_form.validate_on_submit():
+#         flash("Access unauthorized.", "danger")
+#         return redirect("/")
 
-    ratings = (Rating
-               .query
-               .filter(or_(
-                   Rating.author.in_(usernames),
-                   Rating.album_id == album_id
-               )).order_by(Rating.timestamp.desc())
-               .limit(10)
-               .offset(offset)
-               .all())
+#     db.session.delete(rating)
+#     db.session.commit()
 
-    get_rating_html = get_template_attribute('rating.html', 'show_rating')
-    rating_htmls = [get_rating_html(rating) for rating in ratings]
+#     return redirect(url_for('show_album', album_id=rating.album_id))
 
-    return jsonify(rating_htmls)
+
+# @app.get('/ratings/load')
+# @login_required
+# def load_ratings():
+#     """Takes information about the ratings to show in the query string and
+#     returns JSON of the html for those ratings"""
+
+#     user = request.args.get('user', '')
+#     album_id = request.args.get('albumId', '')
+#     homepage = request.args.get('homepage')
+#     offset = request.args.get('offset', 0)
+
+#     if homepage:
+#         usernames = [user.username for user in g.user.following] + \
+#             [g.user.username]
+#     else:
+#         usernames = [user]
+
+#     ratings = (Rating
+#                .query
+#                .filter(or_(
+#                    Rating.author.in_(usernames),
+#                    Rating.album_id == album_id
+#                )).order_by(Rating.timestamp.desc())
+#                .limit(10)
+#                .offset(offset)
+#                .all())
+
+#     get_rating_html = get_template_attribute('rating.html', 'show_rating')
+#     rating_htmls = [get_rating_html(rating) for rating in ratings]
+
+#     return jsonify(rating_htmls)
 
 
 @app.get('/ratings')
-# @jwt_required()
+@jwt_required()
 def get_ratings_data():
     """Returns JSON data of ratings from database"""
 
@@ -547,7 +558,7 @@ def get_ratings_data():
 
 
 @app.get('/ratings/<int:rating_id>')
-# @jwt_required()
+@jwt_required()
 def get_rating_data(rating_id):
     """Returns JSON data of a single rating from database"""
 
