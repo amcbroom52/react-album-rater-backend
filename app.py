@@ -241,12 +241,13 @@ def handle_signup_form():
             password=request.json.get("password"),
         )
 
+        db.session.commit()
     except IntegrityError as e:
-
+        print("****************************************************************ERRRRRORRRRRRRRR***********************************************************************************", e)
+        db.session.rollback()
         return jsonify({"errors": e})
 
     else:
-        db.session.commit()
 
         token = create_access_token(
             identity={"username": username},
@@ -269,7 +270,7 @@ def login_user():
 
 
     if not user:
-        return jsonify({'errors': ['Invalid credentials']}), 401
+        return jsonify({'errors': ['Invalid credentials']}), 400
 
     token = create_access_token(
         identity={"username": username},
