@@ -232,20 +232,32 @@ def handle_signup_form():
     """Create new user and log them in"""
 
     username = request.json.get("username")
+    password = request.json.get("password")
+
+    print(request.json)
 
     try:
         user = User.signup(
             username=username,
             first_name=request.json.get("firstName"),
             last_name=request.json.get("lastName"),
-            password=request.json.get("password"),
+            # password=request.json.get("password"),
+            password=password
         )
+
 
         db.session.commit()
     except IntegrityError as e:
         print("****************************************************************ERRRRRORRRRRRRRR***********************************************************************************", e)
+        print("ERROR MESSAGE HAS ENDED")
         db.session.rollback()
-        return jsonify({"errors": e})
+        return jsonify({"errors": ['Username is taken.']}), 400
+    except ValueError as e:
+        print("****************************************************************ERRRRRORRRRRRRRR***********************************************************************************", e)
+        print("ERROR MESSAGE HAS ENDED")
+        print("****************PASSWORD ", password, "USERNAME", username, "************************")
+        db.session.rollback()
+        return jsonify({"errors": ['Please fill all required fields.']}), 400
 
     else:
 
