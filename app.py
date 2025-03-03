@@ -309,6 +309,18 @@ def get_user_data(username):
     return jsonify({"user": user.serialize()})
 
 
+@app.get('/users/following/<username>')
+@jwt_required()
+def is_user_following(username):
+    """Returns JSON of true or false stating if the current user is following
+    the given user"""
+
+    user = User.query.get_or_404(username)
+    curr_user = User.query.get(get_jwt_identity()["username"])
+
+    return jsonify({"answer": curr_user.is_following(user)})
+
+
 # @app.route('/edit-user', methods=["GET", "POST"])
 # @login_required
 # def handle_edit_user_form():
@@ -569,7 +581,7 @@ def get_ratings_data():
     album_id = request.args.get("albumId")
 
     if homepage == "True":
-        curr_user = User.query.get_or_404(get_jwt_identity()["username"])
+        curr_user = User.query.get(get_jwt_identity()["username"])
         usernames = [user.username for user in curr_user.following] + \
             [curr_user.username]
     else :
