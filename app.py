@@ -228,11 +228,10 @@ def do_logout():
 ################################# User Routes ##################################
 
 @app.post('/signup')
-def handle_signup_form():
-    """Create new user and log them in"""
+def signup_user():
+    """Create new user and return their jwt token"""
 
     username = request.json.get("username")
-    password = request.json.get("password")
 
     print(request.json)
 
@@ -241,8 +240,7 @@ def handle_signup_form():
             username=username,
             first_name=request.json.get("firstName"),
             last_name=request.json.get("lastName"),
-            # password=request.json.get("password"),
-            password=password
+            password=request.json.get("password")
         )
 
 
@@ -563,9 +561,25 @@ def get_user_data(username):
 @app.get('/ratings')
 @jwt_required()
 def get_ratings_data():
-    """Returns JSON data of ratings from database"""
+    """Returns JSON data of ratings from database filtered according to the
+    search query parameters"""
 
-    ratings = Rating.query.all()
+    homepage = request.args.get('homepage')
+    user = request.args.get("user")
+    album_id = request.args.get("albumId")
+
+    if homepage == "True":
+        curr_user = User.query.get_or_404(get_jwt_identity()["username"])
+        usernames = [user.username for user in curr_user.following] + \
+            [curr_user.username]
+    else :
+        usernames = [user]
+
+    ratings = (Rating.query.filter(
+        or_(Rating.author.in_(usernames), Rating.album_id == album_id))
+        .order_by(Rating.timestamp.desc())
+        .all()
+        )
 
     return jsonify({"ratings": [rating.serialize() for rating in ratings]})
 
