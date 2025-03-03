@@ -88,9 +88,9 @@ class User(db.Model):
 
         return {
             'username': self.username,
-            'first_name': self.first_name,
-            'last_name': self.last_name,
-            'image_url': self.image_url,
+            'firstName': self.first_name,
+            'lastName': self.last_name,
+            'imageUrl': self.image_url,
             'bio': self.bio
         }
 
