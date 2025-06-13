@@ -305,20 +305,44 @@ def get_user_data(username):
     """Return JSON data of a specific user"""
 
     user = User.query.get_or_404(username)
+    curr_user = User.query.get(get_jwt_identity()["username"])
 
-    return jsonify({"user": user.serialize()})
+    return jsonify({
+        "user": user.serialize(),
+        "following": curr_user.is_following(user)
+    })
 
-
-@app.get('/users/following/<username>')
+@app.post('/users/<username>/follow')
 @jwt_required()
-def is_user_following(username):
-    """Returns JSON of true or false stating if the current user is following
-    the given user"""
+def follow_or_unfollow_user(username):
+    """Creates or deletes the following relationship between the given user and
+    the signed in user in the database, returns success message"""
 
     user = User.query.get_or_404(username)
     curr_user = User.query.get(get_jwt_identity()["username"])
 
-    return jsonify({"answer": curr_user.is_following(user)})
+    if curr_user.is_following(user):
+        curr_user.following.remove(user)
+        statement = "unfollowed"
+
+    else:
+        curr_user.following.append(user)
+        statement = "followed"
+
+    db.session.commit()
+
+    return jsonify("User ", statement, " successfully.")
+
+# @app.get('/users/following/<username>')
+# @jwt_required()
+# def is_user_following(username):
+#     """Returns JSON of true or false stating if the current user is following
+#     the given user"""
+
+#     user = User.query.get_or_404(username)
+#     curr_user = User.query.get(get_jwt_identity()["username"])
+
+#     return jsonify({"answer": curr_user.is_following(user)})
 
 
 # @app.route('/edit-user', methods=["GET", "POST"])
